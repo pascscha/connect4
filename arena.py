@@ -25,17 +25,17 @@ class Arena:
             start_time = time.time()
 
             if not cls.make_move(active_player, gb):
-                return Outcome(red_won=not redsTurn, illegal=True)
+                return Outcome(gb, red_won=not redsTurn, illegal=True)
 
             elif params.timeout is not None and time.time() - start_time > params.timeout:
-                return Outcome(red_won=not redsTurn, timeout=True)
+                return Outcome(gb, red_won=not redsTurn, timeout=True)
 
             elif gb.has_won(active_player.color):
-                return Outcome(red_won=redsTurn)
+                return Outcome(gb, red_won=redsTurn)
 
             redsTurn = not redsTurn
             move += 1
-        return Outcome(red_won=False, tie=True)
+        return Outcome(gb, red_won=False, tie=True)
 
     @classmethod
     def make_move(cls, player, gb):
@@ -49,11 +49,30 @@ class Arena:
 
 
 class Outcome:
-    def __init__(self, red_won=True, illegal=False, timeout=False, tie=False):
+    def __init__(self, gb, red_won=True, illegal=False, timeout=False, tie=False):
+        self.gb = gb
         self.red_won = red_won
         self.illegal = illegal
         self.tie = tie
         self.timeout = timeout
+
+    def __str__(self):
+        if self.tie:
+            return "Tie"
+        elif self.illegal:
+            if self.red_won:
+                return "{} made an Illegal move".format(self.gb.get_occupation_string(self.gb.YELLOW))
+            else:
+                return "{} made an Illegal move".format(self.gb.get_occupation_string(self.gb.RED))
+        elif self.timeout:
+            if self.red_won:
+                return "{} timed out".format(self.gb.get_occupation_string(self.gb.YELLOW))
+            else:
+                return "{} timed out".format(self.gb.get_occupation_string(self.gb.RED))
+        elif self.red_won:
+            return "{} Won".format(self.gb.get_occupation_string(self.gb.RED))
+        else:
+            return "{} Won".format(self.gb.get_occupation_string(self.gb.YELLOW))
 
 
 class GameParameters:
