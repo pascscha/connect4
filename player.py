@@ -40,7 +40,7 @@ class HumanPlayer(Player):
 
 
 class TimedPlayer(Player):
-    SAFETY_TIME = .1
+    SAFETY_TIME = .05
 
     def next_move(self, gb):
         timeout = time.time() + self.timeout - self.SAFETY_TIME

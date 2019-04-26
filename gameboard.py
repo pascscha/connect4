@@ -182,6 +182,9 @@ class BasicGameBoard(GameBoard):
 
 class BitBoard7x6(GameBoard):
     """BitBoard Class (At most 8x8)"""
+
+    # WARNING: THESE CONSTANTS CANNOT BE CHANGED
+    # WITHOUT BRAKING IMPORTANT FUNCTIONS
     RED = 0
     YELLOW = 1
     EMPTY = 2
@@ -209,6 +212,10 @@ class BitBoard7x6(GameBoard):
             self.disks[1] = other.disks[1]
         else:
             super().copy_gamestate(other)
+
+    @classmethod
+    def other_player(cls, player):
+        return 1 - player
 
     @classmethod
     def count_bits(self, x):
