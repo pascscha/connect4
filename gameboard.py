@@ -138,16 +138,16 @@ class BasicGameBoard(GameBoard):
         for direction in self.DIRECTIONS:
             if direction[0] > 0:
                 start_r = 0
-                end_r = self.ROWS - direction[0] * 4
+                end_r = self.ROWS - direction[0] * 3
             else:
-                start_r = direction[0] * -4
+                start_r = direction[0] * -3
                 end_r = self.ROWS
 
             if direction[1] > 0:
                 start_c = 0
-                end_c = self.COLS - direction[1] * 4
+                end_c = self.COLS - direction[1] * 3
             else:
-                start_c = direction[1] * -4
+                start_c = direction[1] * -3
                 end_c = self.COLS
 
             for r in range(start_r, end_r):

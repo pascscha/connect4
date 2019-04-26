@@ -2,9 +2,11 @@ import time
 
 
 class Player:
+    IS_HUMAN = False
+
     def __init__(self, color, params):
         self.color = color
-        if self.params.timeout is not None:
+        if params.timeout is not None:
             self.timeout = params.timeout
         else:
             self.timeout = 0xdeadbeef
@@ -19,6 +21,8 @@ class Player:
 
 
 class HumanPlayer(Player):
+    IS_HUMAN = True
+
     def next_move(self, gb):
         while True:
             move_raw = input("Player {}, were do you want to move next? ".format(gb.get_occupation_string(self.color)))
@@ -34,8 +38,10 @@ class HumanPlayer(Player):
 
 
 class TimedPlayer(Player):
+    SAFETY_TIME = .1
+
     def next_move(self, gb):
-        timeout = time.time() + self.timeout
+        timeout = time.time() + self.timeout - self.SAFETY_TIME
         move = 0
         try:
             for depth in range(gb.ROWS * gb.COLS):
@@ -57,7 +63,7 @@ class AlphaBetaPlayer(TimedPlayer):
     WIN_SCORE = 1000
 
     def next_move_timeout(self, gb, depth, timeout):
-        player = self.color
+        player = gb.other_player(self.color)
         alpha = self.ALPHA_INIT
         beta = self.BETA_INIT
 
@@ -65,7 +71,7 @@ class AlphaBetaPlayer(TimedPlayer):
         bestMove = -1
 
         for pos in self.POSITION_ORDER:
-            if clone.place_stone(player):
+            if clone.place_stone(pos, player):
                 if clone.has_won(player):
                     return pos
                 score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
@@ -90,7 +96,7 @@ class AlphaBetaPlayer(TimedPlayer):
         clone = gb.clone()
 
         for pos in self.POSITION_ORDER:
-            if clone.place_stone(player):
+            if clone.place_stone(pos, player):
                 if clone.has_won(player):
                     return pos
                 score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
@@ -104,3 +110,13 @@ class AlphaBetaPlayer(TimedPlayer):
     def score(self, gb, depth):
         """Gives a score to a given position."""
         raise NotImplementedError("Please Implement this method")
+
+
+class SimplePlayer(AlphaBetaPlayer):
+    def score(self, gb, depth):
+        if gb.has_won(self.color):
+            return 100 * depth
+        elif gb.has_won(gb.other_player(self.color)):
+            return -1000 * depth
+        else:
+            return 0

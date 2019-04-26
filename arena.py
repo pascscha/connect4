@@ -27,7 +27,7 @@ class Arena:
             if not cls.make_move(active_player, gb):
                 return Outcome(gb, red_won=not redsTurn, illegal=True)
 
-            elif params.timeout is not None and time.time() - start_time > params.timeout:
+            elif params.timeout is not None and not active_player.IS_HUMAN and time.time() - start_time > params.timeout:
                 return Outcome(gb, red_won=not redsTurn, timeout=True)
 
             elif gb.has_won(active_player.color):

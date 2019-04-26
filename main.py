@@ -1,11 +1,14 @@
 #!/usr/bin/python3
+
 if __name__ == "__main__":
     from arena import Arena, GameParameters
     from gameboard import BasicGameBoard
-    from player import HumanPlayer
+    from player import SimplePlayer, HumanPlayer
 
     arena = Arena()
 
-    params = GameParameters()
+    params = GameParameters(timeout=1)
 
-    arena.play_game(HumanPlayer, HumanPlayer, BasicGameBoard, params)
+    outcome = arena.play_game(HumanPlayer, SimplePlayer, BasicGameBoard, params)
+
+    print("\nGAME FINISHED - {}:\n{}".format(outcome, outcome.gb))
