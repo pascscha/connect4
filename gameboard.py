@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 
-import numpy
+import numpy as np
 
 
 class GameBoard:
@@ -17,15 +18,15 @@ class GameBoard:
     }
 
     def __init__(self):
-        for r in range(ROWS):
-            for c in range(COLS):
-                self.set_field(r, c, self.EMPTY)
+        for r in range(self.ROWS):
+            for c in range(self.COLS):
+                self.set_occupation(r, c, self.EMPTY)
 
-    def set_field(self, row, col, value):
+    def set_occupation(self, row, col, value):
         """Sets The field at row, col to a specific value"""
         raise NotImplementedError("Please Implement this method")
 
-    def get_field(self, row, col):
+    def get_occupation(self, row, col):
         """Gets the field value at row, col"""
         raise NotImplementedError("Please Implement this method")
 
@@ -41,7 +42,7 @@ class GameBoard:
         """Checks wether the game board is full"""
         raise NotImplementedError("Please Implement this method")
 
-    def place_stone(self, col):
+    def place_stone(self, row):
         """Place a stone into a column and let it drop to the bottom.
         Returns True iff Action was successfull"""
         raise NotImplementedError("Please Implement this method")
@@ -52,13 +53,12 @@ class GameBoard:
         for c in range(self.COLS):
             occupations = []
             for r in range(self.ROWS):
-                occupation = self.get_field(r, c)
+                occupation = self.get_occupation(r, c)
                 if occupation in self.STRINGS:
                     occupations.append(self.STRINGS[occupation])
                 else:
                     raise ValueError("Invalid Game Board occupation: {}".format(occupation))
             lines.append("|".join(occupations))
-        lines.append("|".join(range(self.ROWS)))
         return "\n".join(lines)
 
     def __eq__(self, other):
@@ -71,7 +71,7 @@ class GameBoard:
             # Check if all other fields are equal
             for r in range(self.ROWS):
                 for c in range(other.ROWS):
-                    if self.get_field(r, c) != other.get_field(r, c):
+                    if self.get_occupation(r, c) != other.get_occupation(r, c):
                         return False
             return True
 
@@ -85,12 +85,13 @@ class BasicGameBoard(GameBoard):
     ]
 
     def __init__(self):
-        self.field = np.array((self.ROWS, self.COLS), self.EMPTY)
+        self.field = np.ndarray(shape=(self.ROWS, self.COLS), dtype=np.byte)
+        self.field.fill(self.EMPTY)
 
-    def set_field(self, row, col, value):
+    def set_occupation(self, row, col, value):
         self.field[row][col] = value
 
-    def get_field(self, row, col):
+    def get_occupation(self, row, col):
         return self.field[row][col]
 
     def has_won(self, player):
@@ -118,7 +119,7 @@ class BasicGameBoard(GameBoard):
     def has_won_dir(self, row, col, direction, player):
         """Checks wether a player has 4 in a row starting from a given row, col and with a given direction"""
         for i in range(4):
-            if self.get_field(row + i * direction[0], col + i * direction[1]) != player:
+            if self.get_occupation(row + i * direction[0], col + i * direction[1]) != player:
                 return False
         return True
 
@@ -131,9 +132,9 @@ class BasicGameBoard(GameBoard):
                 return False
         return True
 
-    def place_stone(self, c, value):
-        for r in range(self.ROWS - 1, -1, -1):
-            if self.field[r][c] == self.EMPTY:
-                self.field[r][c] == value
+    def place_stone(self, r, value):
+        for c in range(self.COLS - 1, -1, -1):
+            if self.get_occupation(r, c) == self.EMPTY:
+                self.set_occupation(r, c, value)
                 return True
         return False
