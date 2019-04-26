@@ -26,6 +26,8 @@ class HumanPlayer(Player):
     def next_move(self, gb):
         while True:
             move_raw = input("Player {}, were do you want to move next? ".format(gb.get_occupation_string(self.color)))
+            if move_raw == "exit":
+                exit(0)
             try:
                 move = int(move_raw)
             except ValueError:
