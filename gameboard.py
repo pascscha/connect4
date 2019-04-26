@@ -22,6 +22,23 @@ class GameBoard:
             for c in range(self.COLS):
                 self.set_occupation(r, c, self.EMPTY)
 
+    def copy_gamestate(self, other):
+        """Copies gamestate of other gameboard"""
+        if not isinstance(other, GameBoard):  # Check if both of them are Gameboards
+            raise ValueError("Can't copy gamestate of a non-gameboard.".format(type(self), type(other)))
+        if self.ROWS != other.ROWS or self.COLS != other.COLS:
+            raise ValueError("Dimensions mismatch.")
+
+        for r in range(self.ROWS):
+            for c in range(self.COLS):
+                occupation = other.get_occupation(r, c)
+                self.set_occupation(r, c, occupation)
+
+    def clone(self):
+        out = self.__class__()
+        out.copy_gamestate(self)
+        return out
+
     def set_occupation(self, row, col, value):
         """Sets The field at row, col to a specific value"""
         raise NotImplementedError("Please Implement this method")
@@ -58,6 +75,15 @@ class GameBoard:
         else:
             raise ValueError("Invalid Game Board occupation: {}".format(occupation))
 
+    @classmethod
+    def other_player(cls, player):
+        if player == cls.RED:
+            return cls.YELLOW
+        elif player == cls.YELLOW:
+            return cls.RED
+        else:
+            raise ValueError("Unknown Player: {}".format(player))
+
     def __str__(self):
         """Returns a string representation of the game board"""
         lines = []
@@ -76,7 +102,7 @@ class GameBoard:
         return "\n".join(lines)
 
     def __eq__(self, other):
-        if not isinstance(self, other):  # Check if both of them are Gameboards
+        if not isinstance(other, GameBoard):  # Check if both of them are Gameboards
             raise ValueError("Can't compare {} and {}.".format(type(self), type(other)))
         else:
             if self.ROWS != other.ROWS or self.COLS != other.COLS:  # Check if dimensions match
@@ -155,3 +181,15 @@ class BasicGameBoard(GameBoard):
 
     def is_legal(self, row):
         return 0 <= row < self.ROWS and self.field[row][-1] == self.EMPTY
+
+
+class BitBoard(GameBoard):
+    def __init__(self):
+        self.disks = np.zeros(shape=(2), dtype=np.int64)
+
+    def copy_gamestate(self, other):
+        if isinstance(other, BitBoard):
+            self.disks[0] = other.disks[0]
+            self.disks[1] = other.disks[1]
+        else:
+            super().copy_gamestate(other)
