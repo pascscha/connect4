@@ -5,28 +5,36 @@ class Arena:
 
     @classmethod
     def play_game(cls, playerClsRed, playerClsYellow, gameBoardCls, params):
-        playerRed = playerCls1(params)
-        playerYellow = playerCls2(params)
         gb = gameBoardCls()
+        playerRed = playerClsRed(gb.RED, params)
+        playerYellow = playerClsYellow(gb.YELLOW, params)
 
         redsTurn = False
-        move = 1
+        move = 0
+
         while not gb.is_finished():
+
             if redsTurn:
                 active_player = playerRed
             else:
                 active_player = playerYellow
 
+            if params.verbose:
+                print("\nMove #{} - {}:\n{}".format(move, active_player.get_name(), gb))
+
             start_time = time.time()
+
             if not cls.make_move(active_player, gb):
                 return Outcome(red_won=not redsTurn, illegal=True)
-            if time.time() - start_time > params.timeout:
+
+            elif params.timeout is not None and time.time() - start_time > params.timeout:
                 return Outcome(red_won=not redsTurn, timeout=True)
-            if gb.has_won(active_player.color):
+
+            elif gb.has_won(active_player.color):
                 return Outcome(red_won=redsTurn)
-            if params.verbose:
-                print("Move #{} - {}:\n{}".format(move, active_player.name, gb))
-            redsTurn != redsTurn
+
+            redsTurn = not redsTurn
+            move += 1
         return Outcome(red_won=False, tie=True)
 
     @classmethod
@@ -36,7 +44,7 @@ class Arena:
             print("{} made an illegal move.".format(player))
             return False
         else:
-            gb.make_move(move)
+            gb.place_stone(move, player.color)
             return True
 
 

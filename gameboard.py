@@ -4,8 +4,8 @@ import numpy as np
 
 
 class GameBoard:
-    ROWS = 6
-    COLS = 7
+    ROWS = 7
+    COLS = 6
 
     EMPTY = 0
     YELLOW = 1
@@ -42,23 +42,37 @@ class GameBoard:
         """Checks wether the game board is full"""
         raise NotImplementedError("Please Implement this method")
 
+    def is_legal(self, row):
+        """Checks wether any player can play in this row"""
+        raise NotImplementedError("Please Implement this method")
+
     def place_stone(self, row):
         """Place a stone into a column and let it drop to the bottom.
         Returns True iff Action was successfull"""
         raise NotImplementedError("Please Implement this method")
 
+    @classmethod
+    def get_occupation_string(cls, occupation):
+        if occupation in cls.STRINGS:
+            return cls.STRINGS[occupation]
+        else:
+            raise ValueError("Invalid Game Board occupation: {}".format(occupation))
+
     def __str__(self):
         """Returns a string representation of the game board"""
         lines = []
-        for c in range(self.COLS):
+        for c in range(self.COLS - 1, -1, -1):
             occupations = []
             for r in range(self.ROWS):
                 occupation = self.get_occupation(r, c)
-                if occupation in self.STRINGS:
-                    occupations.append(self.STRINGS[occupation])
-                else:
-                    raise ValueError("Invalid Game Board occupation: {}".format(occupation))
+                occupation_string = self.get_occupation_string(occupation)
+                occupations.append(occupation_string)
             lines.append("|".join(occupations))
+        lines.append("-" * (2 * self.ROWS - 1))
+        numbers = []
+        for n in range(self.ROWS):
+            numbers.append(str(n))
+        lines.append("|".join(numbers))
         return "\n".join(lines)
 
     def __eq__(self, other):
@@ -133,8 +147,11 @@ class BasicGameBoard(GameBoard):
         return True
 
     def place_stone(self, r, value):
-        for c in range(self.COLS - 1, -1, -1):
+        for c in range(self.COLS):
             if self.get_occupation(r, c) == self.EMPTY:
                 self.set_occupation(r, c, value)
                 return True
         return False
+
+    def is_legal(self, row):
+        return 0 <= row < self.ROWS and self.field[row][-1] == self.EMPTY

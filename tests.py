@@ -2,7 +2,7 @@
 
 import gameboard
 
-print("Testing Basic GameBoard ", end="", flush=True)
+print("Testing BasicGameBoard ", end="", flush=True)
 gb = gameboard.BasicGameBoard()
 
 for r in range(gb.ROWS):
@@ -16,8 +16,4 @@ assert(gb.place_stone(2, gb.YELLOW))
 assert(gb.place_stone(2, gb.YELLOW))
 assert(gb.place_stone(3, gb.RED))
 
-
-print(gb)
-
-
-print(" Done!")
+print("- Done!")
