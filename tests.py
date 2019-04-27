@@ -93,7 +93,7 @@ def tournament_players(players):
     print()
 
     for i in range(len(players)):
-        print(i, end=" ")
+        print(i, end=" ", flush=True)
         for j in range(len(players)):
             if i != j:
                 outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)

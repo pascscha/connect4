@@ -35,13 +35,13 @@ class Arena:
                 print("\nMove #{} - {} ({}):".format(move,
                                                      gb.get_occupation_string(active_player.color),
                                                      active_player.get_name()))
-            for r in range(gb.ROWS):
-                if r == mv:
-                    print("v", end=" ")
-                else:
-                    print(" ", end=" ")
-            print()
-            print(gb)
+                for r in range(gb.ROWS):
+                    if r == mv:
+                        print("v", end=" ")
+                    else:
+                        print(" ", end=" ")
+                print()
+                print(gb)
 
             redsTurn = not redsTurn
             move += 1
@@ -95,9 +95,9 @@ class Outcome:
         elif self.timeout:
             return "t"
         elif self.red_won:
-            return "<"
-        else:
             return "^"
+        else:
+            return "<"
 
 
 class GameParameters:

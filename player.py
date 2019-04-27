@@ -1,4 +1,5 @@
 import time
+import random
 
 
 class Player:
@@ -120,7 +121,27 @@ class AlphaBetaPlayer(TimedPlayer):
         raise NotImplementedError("Please Implement this method")
 
 
-class SimplePlayer(AlphaBetaPlayer):
+class RandomAlphaBetaPlayer(AlphaBetaPlayer):
+    POSITION_ORDER_BASE = [3, 2, 4, 5, 1, 0, 6]
+    POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
+    RANDOMNESS = .3
+
+    def random_order(self):
+        for i in range(len(self.POSITION_ORDER_BASE)):
+            self.POSITION_ORDER[i] = self.POSITION_ORDER_BASE[i]
+
+        for i in range(len(self.POSITION_ORDER_BASE) - 1):
+            if random.random() < self.RANDOMNESS:
+                temp = self.POSITION_ORDER[i]
+                self.POSITION_ORDER[i] = self.POSITION_ORDER[i + 1]
+                self.POSITION_ORDER[i + 1] = temp
+
+    def next_move_timeout(self, gb, depth, timeout):
+        self.random_order()
+        return super().next_move_timeout(gb, depth, timeout)
+
+
+class SimplePlayer(RandomAlphaBetaPlayer):
     def score(self, gb, depth):
         if gb.has_won(self.color):
             return 100 * depth
@@ -130,6 +151,6 @@ class SimplePlayer(AlphaBetaPlayer):
             return 0
 
 
-class SimplePlayer2(AlphaBetaPlayer):
+class SimplePlayer2(RandomAlphaBetaPlayer):
     def score(self, gb, depth):
         return gb.count3(self.color) - gb.count3(gb.other_player(self.color))
