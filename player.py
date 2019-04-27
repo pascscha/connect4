@@ -58,9 +58,15 @@ class TimedPlayer(Player):
         raise NotImplementedError("Please Implement this method")
 
 
+class Depth3Player(TimedPlayer):
+    def next_move(self, gb):
+        timeout = time.time() + 100
+        return self.next_move_timeout(gb, 6, timeout)
+
+
 class AlphaBetaPlayer(TimedPlayer):
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
-    ALPHA_INIT = -100000
+    ALPHA_INIT = -0xfffffff0
     BETA_INIT = -ALPHA_INIT
     WIN_SCORE = 1000
 
@@ -77,7 +83,7 @@ class AlphaBetaPlayer(TimedPlayer):
                 if clone.has_won(player):
                     return pos
                 score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
-                if score > alpha:
+                if score > alpha or bestMove == -1:
                     alpha = score
                     bestMove = pos
                 clone = gb.clone()
