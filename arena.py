@@ -20,7 +20,10 @@ class Arena:
                 active_player = playerYellow
 
             if params.verbose:
-                print("\nMove #{} - {}:\n{}".format(move, active_player.get_name(), gb))
+                print("\nMove #{} - {} ({}):\n{}".format(move,
+                                                         active_player.get_name(),
+                                                         gb.get_occupation_string(active_player.color),
+                                                         gb))
 
             start_time = time.time()
 
@@ -41,7 +44,6 @@ class Arena:
     def make_move(cls, player, gb):
         move = player.next_move(gb)
         if not gb.is_legal(move):
-            print("{} made an illegal move.".format(player))
             return False
         else:
             gb.place_stone(move, player.color)

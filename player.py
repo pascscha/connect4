@@ -126,4 +126,4 @@ class SimplePlayer(AlphaBetaPlayer):
 
 class SimplePlayer2(AlphaBetaPlayer):
     def score(self, gb, depth):
-        return 0
+        return gb.count3(self.color) - gb.count3(gb.other_player(self.color))

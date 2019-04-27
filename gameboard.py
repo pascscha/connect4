@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import numpy as np
+np.seterr(all='ignore')
 
 
 class GameBoard:
@@ -66,6 +67,10 @@ class GameBoard:
     def place_stone(self, row, player):
         """Place a stone into a column and let it drop to the bottom.
         Returns True iff Action was successfull"""
+        raise NotImplementedError("Please Implement this method")
+
+    def count3(self, player):
+        """Counts how many times a player has 3 in a row"""
         raise NotImplementedError("Please Implement this method")
 
     @classmethod
@@ -210,6 +215,7 @@ class BitBoard7x6(GameBoard):
         if isinstance(other, self.__class__):
             self.disks[0] = other.disks[0]
             self.disks[1] = other.disks[1]
+            self.top_empty = other.top_empty
         else:
             super().copy_gamestate(other)
 
@@ -277,6 +283,48 @@ class BitBoard7x6(GameBoard):
 
     def is_legal(self, row):
         return 0 <= row < self.ROWS and self.top_empty & self.ROW_MASKS[row] != 0
+
+    def count3(self, player):
+        board = self.disks[player]
+
+        # vertical
+        possible = (board << 1) & (board << 2) & (board << 3)  # straight up
+
+        # horizontal
+        intermed = (board << 8) & (board << 16)  # two on left
+        possible |= intermed & (board << 24)  # XXX.
+        possible |= intermed & (board >> 8)  # XX.X
+
+        intermed = (board >> 8) & (board >> 16)  # two on right
+        possible |= intermed & (board >> 24)  # .XXX
+        possible |= intermed & (board << 8)  # X.XX
+
+        # diagonal 1
+        intermed = (board << 7) & (board << 16)
+        possible |= intermed & (board << 21)
+        possible |= intermed & (board >> 7)
+        intermed = (board >> 7) & (board >> 16)
+        possible |= intermed & (board >> 21)
+        possible |= intermed & (board << 7)
+
+        # diagonal 2
+        intermed = (board << 9) & (board << 18)
+        possible |= intermed & (board << 27)
+        possible |= intermed & (board >> 9)
+        intermed = (board >> 9) & (board >> 18)
+        possible |= intermed & (board >> 27)
+        possible |= intermed & (board << 9)
+
+        possible &= ~self.disks[1 - player]
+
+        # Weighted
+        return 7 * self.count_bits(possible & 0x01010101010101) + \
+            6 * self.count_bits(possible & 0x02020202020202) +\
+            5 * self.count_bits(possible & 0x04040404040404) +\
+            4 * self.count_bits(possible & 0x08080808080808) +\
+            3 * self.count_bits(possible & 0x10101010101010) +\
+            2 * self.count_bits(possible & 0x20202020202020) +\
+            1 * self.count_bits(possible & 0x40404040404040)
 
     def __eq__(self, other):
         if not isinstance(other, BitBoard7x6):
