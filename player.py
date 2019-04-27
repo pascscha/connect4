@@ -122,3 +122,8 @@ class SimplePlayer(AlphaBetaPlayer):
             return -1000 * depth
         else:
             return 0
+
+
+class SimplePlayer2(AlphaBetaPlayer):
+    def score(self, gb, depth):
+        return 0

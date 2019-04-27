@@ -74,6 +74,18 @@ class Outcome:
         else:
             return "{} Won".format(self.gb.get_occupation_string(self.gb.YELLOW))
 
+    def get_char(self):
+        if self.tie:
+            return "T"
+        elif self.illegal:
+            return "I"
+        elif self.timeout:
+            return "t"
+        elif self.red_won:
+            return "<"
+        else:
+            return "^"
+
 
 class GameParameters:
     def __init__(self, timeout=None, verbose=True):

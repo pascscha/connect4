@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from gameboard import *
 from player import *
-from arena import GameParameters
+from arena import GameParameters, Arena
 import cProfile
 import random
 
@@ -78,32 +78,48 @@ def benchmark_players(players):
         cProfile.run('test_player({})'.format(Player.__name__))
 
 
+def tournament_players(players):
+    timeout = float(input("How much time per move? "))
+    params = GameParameters(timeout=timeout, verbose=False)
+    arena = Arena()
+
+    print("\nParticipating players:")
+    for i in range(len(players)):
+        print("{}: {}".format(i, players[i].__name__))
+
+    print("\n ", end=" ")
+    for i in range(len(players)):
+        print(i, end=" ")
+    print()
+
+    for i in range(len(players)):
+        print(i, end=" ")
+        for j in range(len(players)):
+            if i != j:
+                outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)
+                print(outcome.get_char(), end=" ")
+            else:
+                print("X", end=" ")
+        print()
+
+
 if __name__ == "__main__":
     gameboards = [BasicGameBoard, BitBoard7x6]
-    players = [SimplePlayer]
+    players = [SimplePlayer, SimplePlayer2]
 
     tests = {test_gameboards: gameboards,
              benchmark_gameboards: gameboards,
-             benchmark_players: players}
+             benchmark_players: players,
+             tournament_players: players}
 
     print("Available tests:")
     for i in range(len(tests.items())):
         function = list(tests)[i]
         print("\t{}: {}".format(i, function.__name__))
-    while True:
-        choice_raw = input("Please choose what test you want to perform: ")
-        if choice_raw == "exit":
-            exit(0)
-        try:
-            choice = int(choice_raw)
-        except ValueError:
-            print("Please enter an integer.")
-            continue
-        if choice < 0 or choice >= len(tests):
-            print("Please enter a number between {} and {}".format(0, len(tests) - 1))
-        else:
-            function = list(tests)[choice]
-            param = list(tests.values())[choice]
-            print()
-            function(param)
-            break
+
+    choice = int(input("\nPlease choose what test you want to perform: "))
+    print()
+
+    function = list(tests)[choice]
+    param = list(tests.values())[choice]
+    function(param)
