@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from gameboard_base import *
+from gameboard.base import *
 
 
 class BasicGameBoard(GameBoard):

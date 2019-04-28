@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from gameboards import *
-from players import *
+from gameboard.implementations import *
+from player.implementations import *
 from arena import GameParameters, Arena
 import cProfile
 import random
@@ -140,11 +140,11 @@ if __name__ == "__main__":
 
     # Gameboards (Class name as string) that we don't want to test
     gameboard_blacklist = ["BasicGameBoard"]
-    gameboards = get_classes_from_module("gameboard", gameboard_blacklist)
+    gameboards = get_classes_from_module("gameboard.implementations", gameboard_blacklist)
 
     # Players (Class name as string) that we don't want to test
     player_blacklist = []
-    players = get_classes_from_module("player", player_blacklist)
+    players = get_classes_from_module("player.implementations", player_blacklist)
 
     # All available Tests
     tests = {test_gameboards: gameboards,

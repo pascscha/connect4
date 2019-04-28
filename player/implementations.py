@@ -1,4 +1,4 @@
-from player_base import *
+from player.base import *
 
 
 class SimplePlayer(HashedPlayer):
