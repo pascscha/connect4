@@ -4,6 +4,9 @@ from player import *
 from arena import GameParameters, Arena
 import cProfile
 import random
+import operator
+import sys
+import inspect
 
 
 def available_moves(gb, player):
@@ -89,9 +92,11 @@ def tournament_players(players):
     params = GameParameters(timeout=timeout, verbose=False)
     arena = Arena()
 
+    scores = {}
     print("\nParticipating players:")
     for i in range(len(players)):
         print("{}: {}".format(i, players[i].__name__))
+        scores[i] = 0
 
     print("\n ", end=" ")
     for i in range(len(players)):
@@ -104,17 +109,42 @@ def tournament_players(players):
             if i != j:
                 outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)
                 print(outcome.get_char(), end=" ", flush=True)
+                if outcome.red_won:
+                    scores[i] += 3
+                elif outcome.tie:
+                    scores[j] += 1
+                    scores[i] += 1
+                else:
+                    scores[j] += 3
             else:
                 print("X", end=" ", flush=True)
         print()
 
+    print("\nScoreboard:")
+    sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
+    for i in range(len(sorted_scores)):
+        player_name = players[sorted_scores[i][0]].__name__
+        score = sorted_scores[i][1]
+        print("{}: {:>3}P {}".format(i, score, player_name))
+
+
+def get_classes_from_module(module, blacklist):
+    out = []
+    for name, obj in inspect.getmembers(sys.modules[module], inspect.isclass):
+        if obj.__module__ == module and obj.__name__ not in blacklist:
+            out.append(obj)
+    return out
+
 
 if __name__ == "__main__":
-    # Gameboards we are intrested in:
-    gameboards = [BasicGameBoard, BitBoard7x6]
 
-    # Players we are intrested in:
-    players = [SimplePlayer, Count3Player, StrategyChangePlayer]
+    # Gameboards (Class name as string) that we don't want to test
+    gameboard_blacklist = ["BasicGameBoard"]
+    gameboards = get_classes_from_module("gameboard", gameboard_blacklist)
+
+    # Players (Class name as string) that we don't want to test
+    player_blacklist = []
+    players = get_classes_from_module("player", player_blacklist)
 
     # All available Tests
     tests = {test_gameboards: gameboards,
