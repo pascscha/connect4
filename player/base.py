@@ -294,6 +294,7 @@ class HashedPlayer(AlphaBetaPlayer):
 
 
 class BookPlayer(AlphaBetaPlayer):
+    """[Abstract] Player that uses an opening book for the first moves"""
 
     # The book file
     BOOK = os.path.dirname(os.path.realpath(__file__)) + "/7x6.book"
@@ -397,23 +398,29 @@ class BookPlayer(AlphaBetaPlayer):
 
 
 class Cheater(Player):
+    """[Abstract] Cheating Player that looks for the best possible move online."""
 
-    IS_HUMAN = True
+    IS_HUMAN = True  # No timelimits for now
 
     def __init__(self, color, params):
-        self.move_string = ""
+        self.move_string = ""  # String containing all moves up to this position
         super().__init__(color, params)
 
     def solve(self, pos):
+        """Call online solver in order to get best move"""
         raw_text = requests.get("https://connect4.gamesolver.org/solve?pos={}".format(pos)).text
         scores = json.loads(raw_text)["score"]
+
         for i in range(len(scores)):
-            if scores[i] == 100:
+            if scores[i] == 100:  # When a column is full the solver assings it score 100
                 scores[i] = -100
-        best = max(scores)
-        return scores.index(best)
+
+        best = max(scores)  # Get the best score ...
+        return scores.index(best)  # ... and return the index of it
 
     def update_gamestate(self, gb):
+        """Updates gamesate (self.move_string) according to the game.the
+        Only works if there is at most 1 new stone on the board"""
         my_gamestate = gb.__class__()
         my_gamestate.apply_move_string(self.move_string, offset=1)
         for r in range(gb.ROWS):
@@ -421,10 +428,3 @@ class Cheater(Player):
                 if gb.get_occupation(r, c) != my_gamestate.get_occupation(r, c):
                     self.move_string += str(r + 1)
                     return
-
-    def next_move(self, gb):
-        if gb.moves_left() != gb.ROWS * gb.COLS:
-            self.update_gamestate(gb)
-        out = self.solve(self.move_string)
-        self.move_string += str(out + 1)
-        return out
