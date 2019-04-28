@@ -34,6 +34,12 @@ class HumanPlayer(Player):
     """Human Player that lets user choose where to play"""
     IS_HUMAN = True
 
+    def __init__(self, color, params):
+        self.name = input("Hi Human Player, what's your name? ")
+        print("Nice to meet you, {}.".format(self.name))
+
+        super().__init__(color, params)
+
     def next_move(self, gb):
         while True:
             move_raw = input("Player {}, were do you want to move next? ".format(gb.get_occupation_string(self.color)))
@@ -53,6 +59,9 @@ class HumanPlayer(Player):
                 # p = SimplePlayer(gb.other_player(self.color), self.params)
                 # print("SCORE:", p.score(gb, 5))
                 return move
+
+    def get_name(self):
+        return self.name
 
 
 class TimedPlayer(Player):

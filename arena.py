@@ -13,6 +13,12 @@ class Arena:
         playerRed = playerClsRed(gb.RED, params)
         playerYellow = playerClsYellow(gb.YELLOW, params)
 
+        if params.verbose:
+            print("\nWelcome to the Epic battle of {} vs {}!".format(playerRed.get_name(), playerYellow.get_name()))
+            print("Move #0 - {} ({}):".format(gb.get_occupation_string(playerRed.color),
+                                                playerRed.get_name()))
+            print(gb)
+
         # Red (1st Player) can start
         redsTurn = True
         move = 0
