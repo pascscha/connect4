@@ -97,15 +97,15 @@ def tournament_players(players):
         for j in range(len(players)):
             if i != j:
                 outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)
-                print(outcome.get_char(), end=" ")
+                print(outcome.get_char(), end=" ", flush=True)
             else:
-                print("X", end=" ")
+                print("X", end=" ", flush=True)
         print()
 
 
 if __name__ == "__main__":
     gameboards = [BasicGameBoard, BitBoard7x6]
-    players = [SimplePlayer, SimplePlayer2, StrategyChanger]
+    players = [SimplePlayer, Count3Player, StrategyChangePlayer]
 
     tests = {test_gameboards: gameboards,
              benchmark_gameboards: gameboards,

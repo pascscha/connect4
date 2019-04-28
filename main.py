@@ -7,8 +7,8 @@ if __name__ == "__main__":
 
     arena = Arena()
 
-    params = GameParameters(timeout=100)
+    params = GameParameters(timeout=1)
 
-    outcome = arena.play_game(SimplePlayer2, HumanPlayer, BitBoard7x6, params)
+    outcome = arena.play_game(StrategyChangePlayer HumanPlayer, BitBoard7x6, params)
 
     print("\nGAME FINISHED - {}:\n{}".format(outcome, outcome.gb))
