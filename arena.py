@@ -95,9 +95,9 @@ class Outcome:
         elif self.timeout:
             return "t"
         elif self.red_won:
-            return "^"
-        else:
             return "<"
+        else:
+            return "^"
 
 
 class GameParameters:

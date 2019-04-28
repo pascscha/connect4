@@ -105,7 +105,7 @@ def tournament_players(players):
 
 if __name__ == "__main__":
     gameboards = [BasicGameBoard, BitBoard7x6]
-    players = [SimplePlayer, SimplePlayer2]
+    players = [SimplePlayer, SimplePlayer2, StrategyChanger]
 
     tests = {test_gameboards: gameboards,
              benchmark_gameboards: gameboards,

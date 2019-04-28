@@ -7,6 +7,7 @@ class Player:
 
     def __init__(self, color, params):
         self.color = color
+        self.params = params
         if params.timeout is not None:
             self.timeout = params.timeout
         else:
@@ -37,18 +38,24 @@ class HumanPlayer(Player):
             if not gb.is_legal(move):
                 print("You can't play there.")
             else:
+                # gb = gb.clone()
+                # gb.place_stone(move, self.color)
+                # print(gb)
+                # p = SimplePlayer(gb.other_player(self.color), self.params)
+                # print("SCORE:", p.score(gb, 5))
                 return move
 
 
 class TimedPlayer(Player):
-    SAFETY_TIME = .05
+    SAFETY_FACTOR = .95
 
     def next_move(self, gb):
-        timeout = time.time() + self.timeout - self.SAFETY_TIME
+        timeout = time.time() + self.timeout * self.SAFETY_FACTOR
         move = 0
         try:
             for depth in range(gb.ROWS * gb.COLS):
                 move = self.next_move_timeout(gb, depth, timeout)
+                print(depth, move)
         except TimeoutError:
             pass
         return move
@@ -59,20 +66,88 @@ class TimedPlayer(Player):
         raise NotImplementedError("Please Implement this method")
 
 
-class Depth3Player(TimedPlayer):
+class DepthPlayer(TimedPlayer):
+    DEPTH = 4
+
     def next_move(self, gb):
         timeout = time.time() + 100
-        return self.next_move_timeout(gb, 6, timeout)
+        move = self.next_move_timeout(gb, self.DEPTH, timeout)
+        return move
 
 
-class AlphaBetaPlayer(TimedPlayer):
+class MiniMaxPlayer(DepthPlayer):
+    POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
+    WIN_SCORE = 1000
+
+    def next_move_timeout(self, gb, depth, timeout):
+        player = self.color  # gb.other_player(self.color)
+
+        clone = gb.clone()
+        bestMove = -1
+        bestScore = -0xfffffff0
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, player):
+                score = self.min(clone, depth - 1, timeout)
+                print(pos, score)
+                if score > bestScore:
+                    bestScore = score
+                    bestMove = pos
+                clone = gb.clone()
+        return bestMove
+
+    def min(self, gb, depth, timeout):
+        if gb.has_won(self.color):
+            return self.WIN_SCORE * (depth + 1)
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        bestScore = 0xfffffff0
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, gb.other_player(self.color)):
+                score = self.max(clone, depth - 1, timeout)
+                if score < bestScore:
+                    bestScore = score
+                clone = gb.clone()
+        return bestScore
+
+    def max(self, gb, depth, timeout):
+        if gb.has_won(gb.other_player(self.color)):
+            return - self.WIN_SCORE * (depth + 1)
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        bestScore = -0xfffffff0
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, self.color):
+                score = self.min(clone, depth - 1, timeout)
+                if depth > 3:
+                    print(" " * (6 - depth), "max", pos, score, self.score(clone, depth))
+                if score > bestScore:
+                    bestScore = score
+                clone = gb.clone()
+        return bestScore
+
+    def score(self, gb, depth):
+        """Gives a score to a given position."""
+        raise NotImplementedError("Please Implement this method")
+
+
+class AlphaBetaPlayer(DepthPlayer):
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
     ALPHA_INIT = -0xfffffff0
     BETA_INIT = -ALPHA_INIT
     WIN_SCORE = 1000
 
     def next_move_timeout(self, gb, depth, timeout):
-        player = gb.other_player(self.color)
+        player = self.color  # gb.other_player(self.color)
         alpha = self.ALPHA_INIT
         beta = self.BETA_INIT
 
@@ -83,24 +158,63 @@ class AlphaBetaPlayer(TimedPlayer):
             if clone.place_stone(pos, player):
                 if clone.has_won(player):
                     return pos
-                score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
+                score = self.min(clone, depth - 1, alpha, beta, timeout)
+                print(depth, pos, score)
                 if score > alpha or bestMove == -1:
                     alpha = score
                     bestMove = pos
                 clone = gb.clone()
         return bestMove
 
+    def min(self, gb, depth, alpha, beta, timeout):
+        if gb.has_won(self.color):
+            return self.WIN_SCORE * depth
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, gb.other_player(self.color)):
+                score = self.max(gb, depth - 1, alpha, beta, timeout)
+                if score < beta:
+                    beta = score
+                if alpha >= beta:
+                    return beta
+                clone = gb.clone()
+        return beta
+
+    def max(self, gb, depth, alpha, beta, timeout):
+        if gb.has_won(gb.other_player(self.color)):
+            return - self.WIN_SCORE * depth
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, gb.other_player(self.color)):
+                score = self.min(gb, depth - 1, alpha, beta, timeout)
+                if score > alpha:
+                    alpha = score
+                if alpha >= beta:
+                    return alpha
+                clone = gb.clone()
+        return alpha
+
     def miniMax(self, gb, depth, player, alpha, beta, timeout):
         if gb.has_won(gb.other_player(player)):
             return -self.WIN_SCORE * depth
         elif gb.has_won(player):
             return self.WIN_SCORE * depth + 1
-        elif alpha >= beta:
-            return beta
-        elif depth <= 0:
-            return self.score(gb, depth)
         elif timeout < time.time():
             raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
 
         clone = gb.clone()
 
@@ -109,10 +223,14 @@ class AlphaBetaPlayer(TimedPlayer):
                 if clone.has_won(player):
                     return pos
                 score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
-                if score >= beta:
-                    return score
-                elif score > alpha:
+                print()
+                print(depth, pos, score, alpha, beta)
+                print(clone)
+                if score > alpha:
                     alpha = score
+                elif alpha >= beta:
+                    return alpha
+
                 clone = gb.clone()
         return alpha
 
@@ -125,6 +243,7 @@ class RandomAlphaBetaPlayer(AlphaBetaPlayer):
     POSITION_ORDER_BASE = [3, 2, 4, 5, 1, 0, 6]
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
     RANDOMNESS = .3
+    random.seed(0)
 
     def random_order(self):
         for i in range(len(self.POSITION_ORDER_BASE)):
@@ -141,12 +260,12 @@ class RandomAlphaBetaPlayer(AlphaBetaPlayer):
         return super().next_move_timeout(gb, depth, timeout)
 
 
-class SimplePlayer(RandomAlphaBetaPlayer):
+class SimplePlayer(MiniMaxPlayer):
     def score(self, gb, depth):
         if gb.has_won(self.color):
-            return 100 * depth
+            return self.WIN_SCORE * (depth + 1)
         elif gb.has_won(gb.other_player(self.color)):
-            return -1000 * depth
+            return -self.WIN_SCORE * (depth + 1)
         else:
             return 0
 
@@ -154,3 +273,18 @@ class SimplePlayer(RandomAlphaBetaPlayer):
 class SimplePlayer2(RandomAlphaBetaPlayer):
     def score(self, gb, depth):
         return gb.count3(self.color) - gb.count3(gb.other_player(self.color))
+
+
+class StrategyChanger(RandomAlphaBetaPlayer):
+    STRATEGY_CHANGE = 30
+
+    def score(self, gb, depth):
+        if gb.has_won(self.color):
+            return 1000 * depth
+        elif gb.has_won(gb.other_player(self.color)):
+            return -1000 * depth
+        else:
+            if depth < self.STRATEGY_CHANGE:
+                return gb.count3(self.color) - gb.count3(gb.other_player(self.color))
+            else:
+                return 0
