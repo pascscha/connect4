@@ -130,6 +130,10 @@ class Count3BookPlayer(BookPlayer):
         return score_count3(gb, self.color)
 
 
+class CheatPlayer(Cheater):
+    pass
+
+
 """
 .1 Seconds per Move:
     Scoreboard:
