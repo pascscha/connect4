@@ -23,6 +23,13 @@ class SimplePlayerAlphaBeta(AlphaBetaPlayer):
         return score_simple(gb, self.color)
 
 
+class SimplePlayerAlphaBetaRandom(RandomizedAlphaBetaPlayer):
+    """Simple Player using Minimax Algorithm"""
+
+    def score(self, gb, depth):
+        return score_simple(gb, self.color)
+
+
 class SimplePlayerAlphaBetaHash(HashedPlayer):
     """ Simple Player using Alpha Beta and Hashing."""
 
@@ -30,7 +37,21 @@ class SimplePlayerAlphaBetaHash(HashedPlayer):
         return score_simple(gb, self.color)
 
 
+class Count3PlayerMinimax(AlphaBetaPlayer):
+    """Tries to maximize 3 in a rows, with a preference of 3 in a rows that are lower on the field"""
+
+    def score(self, gb, depth):
+        return score_count3(gb, self.color)
+
+
 class Count3Player(AlphaBetaPlayer):
+    """Tries to maximize 3 in a rows, with a preference of 3 in a rows that are lower on the field"""
+
+    def score(self, gb, depth):
+        return score_count3(gb, self.color)
+
+
+class Count3PlayerRandom(RandomizedAlphaBetaPlayer):
     """Tries to maximize 3 in a rows, with a preference of 3 in a rows that are lower on the field"""
 
     def score(self, gb, depth):
@@ -99,6 +120,16 @@ class StrategyChangePlayerHash(HashedPlayer):
             return score_simple(gb, self.color)
 
 
+class SimpleBookPlayer(BookPlayer):
+    def score(self, gb, depth):
+        return score_simple(gb, self.color)
+
+
+class Count3BookPlayer(BookPlayer):
+    def score(self, gb, depth):
+        return score_count3(gb, self.color)
+
+
 """
 .1 Seconds per Move:
     Scoreboard:
@@ -140,4 +171,22 @@ class StrategyChangePlayerHash(HashedPlayer):
     5:  16P Count3PlayerHash0
     6:  15P Count3PlayerHash3
     7:  12P StrategyChangePlayerHash
+
+
+
+.1 Seconds per Move:
+    0 1 2 3 4
+    0 X < < < T
+    1 < X ^ ^ <
+    2 < ^ X ^ <
+    3 ^ ^ ^ X ^
+    4 T < < < X
+
+    Scoreboard:
+    0:  14P Count3BookPlayer
+    1:  14P SimpleBookPlayer
+    2:  12P Count3Player
+    3:  12P Count3PlayerMinimax
+    4:   6P Count3PlayerRandom
+
 """

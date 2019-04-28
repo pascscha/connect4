@@ -172,14 +172,19 @@ if __name__ == "__main__":
 
     # Players (Class name as string) that we want to test
     player_whitelist = [
-        "Count3PlayerHash0",
-        "Count3PlayerHash1",
-        "Count3PlayerHash2",
-        "Count3PlayerHash3",
-        "Count3PlayerHash4",
+        "Count3Player",
+        "Count3PlayerMinimax",
+        "Count3PlayerRandom",
+        "SimpleBookPlayer",
+        "Count3BookPlayer",
+        #"Count3PlayerHash0",
+        #"Count3PlayerHash1",
+        #"Count3PlayerHash2",
+        #"Count3PlayerHash3",
+        #"Count3PlayerHash4",
     ]
 
-    players = get_classes_from_module("player.implementations", blacklist=player_blacklist)
+    players = get_classes_from_module("player.implementations", whitelist=player_whitelist)
 
     # All available Tests
     tests = {test_gameboards: gameboards,

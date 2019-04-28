@@ -257,7 +257,7 @@ class RandomizedAlphaBetaPlayer(AlphaBetaPlayer):
         return super().next_move_timeout(gb, depth, timeout)
 
 
-class HashedPlayer(RandomizedAlphaBetaPlayer):
+class HashedPlayer(AlphaBetaPlayer):
     MIN_HASH_DEPTH = 0
 
     def next_move_timeout(self, gb, depth, timeout):
@@ -287,3 +287,96 @@ class HashedPlayer(RandomizedAlphaBetaPlayer):
                 return score
         else:
             return super().max(gb, depth, alpha, beta, timeout)
+
+
+class BookPlayer(AlphaBetaPlayer):
+    BOOK = "7x6.book"
+
+    MIN_SCORE = -0xfffffff0
+
+    def __init__(self, color, params):
+        try:
+            with open(self.BOOK, "rb") as f:
+                self.WIDTH = self.bytes2int(f.read(1))
+                self.HEIGHT = self.bytes2int(f.read(1))
+                self.DEPTH = self.bytes2int(f.read(1))
+                self.KEY_SIZE = self.bytes2int(f.read(1))
+                self.VALUE_SIZE = self.bytes2int(f.read(1))
+                self.LOG_SIZE = self.bytes2int(f.read(1))
+                self.BOOK_SIZE = self.next_prime(1 << self.LOG_SIZE)
+                self.KEYS = f.read(self.BOOK_SIZE)
+                self.VALUES = f.read(self.BOOK_SIZE)
+            self.book_open = True
+        except Exception as e:
+            print("Could not open book.")
+            self.book_open = False
+
+        super().__init__(color, params)
+
+    @staticmethod
+    def bytes2int(str):
+        return int.from_bytes(str, byteorder='big')
+
+    @classmethod
+    def med(cls, lower, upper):
+        return (upper + lower) // 2
+
+    @classmethod
+    def has_factor(cls, n, lower, upper):
+        if lower ** 2 > n:
+            return False
+        elif lower + 1 >= upper:
+            return n % lower == 0
+        else:
+            return cls.has_factor(n, lower, cls.med(lower, upper)) or \
+                cls.has_factor(n, cls.med(lower, upper), upper)
+
+    @classmethod
+    def next_prime(cls, n):
+        if cls.has_factor(n, 2, n):
+            return cls.next_prime(n + 1)
+        else:
+            return n
+
+    def read_book(self, gb):
+        if gb.ROWS * gb.COLS - gb.moves_left() <= self.DEPTH:
+            i = gb.base3Rep(self.color)
+
+            if i > len(self.KEYS):
+                return None
+
+            key = self.KEYS[i]
+
+            if i % (1 << (self.KEY_SIZE * 8)) != key:
+                return None
+            else:
+                return 19 - self.VALUES[i]
+        else:
+            return None
+
+    def next_move(self, gb):
+        if self.book_open:
+
+            clone = gb.clone()
+            bestMove = -1
+            bestScore = self.MIN_SCORE
+            has_none = False
+
+            for pos in self.POSITION_ORDER:
+                if clone.place_stone(pos, self.color):
+                    score = self.read_book(clone)
+                    clone = gb.clone()
+                    if score is None:
+                        has_none = True
+                        continue
+                    if score > bestScore:
+                        bestScore = score
+                        bestMove = pos
+
+            if bestMove < 0 and has_none:
+                self.book_open = False
+                return super().next_move(gb)
+            else:
+                return bestMove
+        else:
+            return super().next_move(gb)

@@ -108,6 +108,35 @@ class GameBoard:
         else:
             raise ValueError("Unknown Player: {}".format(player))
 
+    def base3RepRow(self, row, key, color):
+        col = 0
+        while self.get_occupation(row, col) != self.EMPTY:
+            key *= 3
+            if self.get_occupation(row, col) == color:
+                key += 2
+            else:
+                key += 1
+            col += 1
+        return key * 3
+
+    def base3Rep(self, color):
+        key_forward = 0
+        for r in range(self.ROWS):
+            key_forward = self.base3RepRow(r, key_forward, color)
+
+        key_backward = 0
+        for r in range(self.ROWS - 1, -1, -1):
+            key_backward = self.base3RepRow(r, key_backward, color)
+
+        return min(key_forward, key_backward) // 3
+
+    def apply_move_string(self, movestring):
+        player = self.RED
+        for row in movestring:
+            row = int(row) - 1
+            self.place_stone(row, player)
+            player = self.other_player(player)
+
     def __str__(self):
         """Returns a string representation of the game board"""
         lines = []
