@@ -5,13 +5,18 @@ np.seterr(all='ignore')
 
 
 class GameBoard:
+    """[Abstract] The base class for a Gameboard"""
+
+    # Board Dimensions
     ROWS = 7
     COLS = 6
 
+    # Occupation Constants
     RED = 0
     YELLOW = 1
     EMPTY = 2
 
+    # Occupation Strings
     STRINGS = {
         EMPTY: " ",
         YELLOW: "O",
@@ -36,6 +41,7 @@ class GameBoard:
                 self.set_occupation(r, c, occupation)
 
     def clone(self):
+        """Returns an identical instance to itself"""
         out = self.__class__()
         out.copy_gamestate(self)
         return out
@@ -107,6 +113,7 @@ class GameBoard:
         return "\n".join(lines)
 
     def __eq__(self, other):
+        """Checks wether two GameBoards are equal"""
         if not isinstance(other, GameBoard):  # Check if both of them are Gameboards
             raise ValueError("Can't compare {} and {}.".format(type(self), type(other)))
         else:
@@ -122,11 +129,14 @@ class GameBoard:
 
 
 class BasicGameBoard(GameBoard):
+    """Basic Gameboard using an array as the game field. Flexible in size"""
+
+    # All directions 4 in a row could appear
     DIRECTIONS = [
-        (0, 1),
-        (1, 0),
-        (1, 1),
-        (-1, 1),
+        (0, 1),  # Vertical |
+        (1, 0),  # Horizontal -
+        (1, 1),  # Diagonal /
+        (-1, 1),  # Diagonal \
     ]
 
     def __init__(self):
@@ -186,7 +196,20 @@ class BasicGameBoard(GameBoard):
 
 
 class BitBoard7x6(GameBoard):
-    """BitBoard Class (At most 8x8)"""
+    """BitBoard Class
+
+      | .  .  .  .  .  .  .  TOP
+    6 | 6 14 22 30 38 46 54
+    5 | 5 13 21 29 37 45 53
+    4 | 4 12 20 28 36 44 52
+    3 | 3 11 19 27 35 43 51
+    2 | 2 10 18 26 34 42 50
+    1 | 1  9 17 25 33 41 49
+    0 | 0  8 16 24 32 40 48  BOTTOM
+      | TTTTTTTTTTTTTTTTTTT
+      | 0  1  2  3  4  5  6
+
+    """
 
     # WARNING: THESE CONSTANTS CANNOT BE CHANGED
     # WITHOUT BRAKING IMPORTANT FUNCTIONS
@@ -194,11 +217,16 @@ class BitBoard7x6(GameBoard):
     YELLOW = 1
     EMPTY = 2
 
+    ROWS = 7
+    COLS = 6
+
+    # Constants used for bit count
     M1 = np.int64(0x5555555555555555)
     M2 = np.int64(0x3333333333333333)
     M4 = np.int64(0x0f0f0f0f0f0f0f0f)
     H01 = np.int64(0x0101010101010101)
 
+    # Masks for each row (vertical)
     ROW_MASKS = np.array([0x0000000000003f,
                           0x00000000003f00,
                           0x000000003f0000,
@@ -337,18 +365,3 @@ class BitBoard7x6(GameBoard):
             return super().__lt__(other)
         else:
             return self.disks[0] < other.disks[0] or self.disks[1] < other.disks[1]
-
-
-"""
-      | .  .  .  .  .  .  .  TOP
-    6 | 6 14 22 30 38 46 54
-    5 | 5 13 21 29 37 45 53
-    4 | 4 12 20 28 36 44 52
-    3 | 3 11 19 27 35 43 51
-    2 | 2 10 18 26 34 42 50
-    1 | 1  9 17 25 33 41 49
-    0 | 0  8 16 24 32 40 48  BOTTOM
-      | TTTTTTTTTTTTTTTTTTT
-      | 0  1  2  3  4  5  6
-
-"""

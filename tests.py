@@ -7,6 +7,7 @@ import random
 
 
 def available_moves(gb, player):
+    """Returns all legal moves for a game board"""
     out = []
     for row in range(gb.ROWS):
         if gb.is_legal(row):
@@ -15,6 +16,7 @@ def available_moves(gb, player):
 
 
 def test_gameboard(GB, n):
+    """Plays n random Games on a GameBoard class"""
     for i in range(n):
         gb = GB()
         player = gb.RED
@@ -25,8 +27,7 @@ def test_gameboard(GB, n):
 
 
 def test_gameboards(gameboards):
-    print("FUNCTIONALITY:")
-
+    """Does some Functionality tests on a GameBoard"""
     for GB in gameboards:
         print("Testing {} ".format(GB.__name__), end="", flush=True)
         gb = GB()
@@ -53,6 +54,7 @@ def test_gameboards(gameboards):
 
 
 def benchmark_gameboards(gameboards):
+    """Benchmarks a GameBoard"""
     for GB in gameboards:
         print("Benchmark for {}:".format(GB.__name__))
         cProfile.run('test_gameboard({},1000)'.format(GB.__name__))
@@ -61,16 +63,19 @@ def benchmark_gameboards(gameboards):
 
 
 def test_player(Player):
+    """Lets a player play a game against himself (used for benchmarking)"""
     params = GameParameters(timeout=1)
     gb = BitBoard7x6()
     p = Player(gb.RED, params)
-    for i in range(10):
+    while not gb.is_finished():
         move = p.next_move(gb)
         gb.place_stone(move, p.color)
         p.color = gb.other_player(p.color)
 
 
 def benchmark_players(players):
+    """Benchmarks Player classes
+    (time will be the same for all of them, but we can still see which functions they spend the most time on)"""
     print("Benchmarking players")
 
     for Player in players:
@@ -79,6 +84,7 @@ def benchmark_players(players):
 
 
 def tournament_players(players):
+    """Lets every player play against every other player in order to determine their strength"""
     timeout = float(input("How much time per move? "))
     params = GameParameters(timeout=timeout, verbose=False)
     arena = Arena()
@@ -104,9 +110,13 @@ def tournament_players(players):
 
 
 if __name__ == "__main__":
+    # Gameboards we are intrested in:
     gameboards = [BasicGameBoard, BitBoard7x6]
+
+    # Players we are intrested in:
     players = [SimplePlayer, Count3Player, StrategyChangePlayer]
 
+    # All available Tests
     tests = {test_gameboards: gameboards,
              benchmark_gameboards: gameboards,
              benchmark_players: players,
@@ -120,6 +130,7 @@ if __name__ == "__main__":
     choice = int(input("\nPlease choose what test you want to perform: "))
     print()
 
+    # Perfrom Test
     function = list(tests)[choice]
     param = list(tests.values())[choice]
     function(param)

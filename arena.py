@@ -2,35 +2,48 @@ import time
 
 
 class Arena:
+    """ Arena Class. This is where the games are managed"""
 
     @classmethod
     def play_game(cls, playerClsRed, playerClsYellow, gameBoardCls, params):
+        """ Plays a game between two Player Classes using a GameBoard Class."""
+
+        # Initialize Classe
         gb = gameBoardCls()
         playerRed = playerClsRed(gb.RED, params)
         playerYellow = playerClsYellow(gb.YELLOW, params)
 
-        redsTurn = False
+        # Red (1st Player) can start
+        redsTurn = True
         move = 0
 
         while not gb.is_finished():
 
+            # Coose active player class
             if redsTurn:
                 active_player = playerRed
             else:
                 active_player = playerYellow
 
+            # Measure Time
             start_time = time.time()
 
-            success, mv = cls.make_move(active_player, gb)
-            if not success:
+            # Make Move
+            legal, mv = cls.make_move(active_player, gb)
+
+            # Illegal Move
+            if not legal:
                 return Outcome(gb, red_won=not redsTurn, last_move=mv, illegal=True)
 
+            # Timeout (Only for non-Human players)
             elif params.timeout is not None and not active_player.IS_HUMAN and time.time() - start_time > params.timeout:
                 return Outcome(gb, red_won=not redsTurn, timeout=True)
 
+            # Check if player won
             elif gb.has_won(active_player.color):
                 return Outcome(gb, red_won=redsTurn)
 
+            # Output
             if params.verbose:
                 print("\nMove #{} - {} ({}):".format(move,
                                                      gb.get_occupation_string(active_player.color),
@@ -43,12 +56,16 @@ class Arena:
                 print()
                 print(gb)
 
+            # Switch players
             redsTurn = not redsTurn
             move += 1
+
+        # Noone has won, it's a tie
         return Outcome(gb, red_won=False, tie=True)
 
     @classmethod
     def make_move(cls, player, gb):
+        """Let a player make a move and check wether it's legal or not"""
         move = player.next_move(gb)
         if not gb.is_legal(move):
             return False, move
@@ -58,6 +75,8 @@ class Arena:
 
 
 class Outcome:
+    """Holds the outcome (result) of a game"""
+
     def __init__(self, gb, red_won=True, illegal=False, last_move=None, timeout=False, tie=False):
         self.gb = gb
         self.red_won = red_won
@@ -67,6 +86,7 @@ class Outcome:
         self.last_move = last_move
 
     def __str__(self):
+        """Verbose toString Method describing the outcome of the game"""
         if self.tie:
             return "Tie"
         elif self.illegal:
@@ -88,6 +108,8 @@ class Outcome:
         return "{} Won".format(self.gb.get_occupation_string(who))
 
     def get_char(self):
+        """Get a single char describing the outcome.
+        (Used for the tournament matrix)"""
         if self.tie:
             return "T"
         elif self.illegal:
@@ -101,6 +123,8 @@ class Outcome:
 
 
 class GameParameters:
+    """Parameters for a connect 4 game"""
+
     def __init__(self, timeout=None, verbose=True):
         self.timeout = timeout
         self.verbose = verbose
