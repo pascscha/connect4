@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from gameboard import *
-from player import *
+from gameboards import *
+from players import *
 from arena import GameParameters, Arena
 import cProfile
 import random

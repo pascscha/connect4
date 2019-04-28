@@ -2,8 +2,8 @@
 
 if __name__ == "__main__":
     from arena import Arena, GameParameters
-    from gameboard import BasicGameBoard, BitBoard7x6
-    from player import *
+    from gameboards import *
+    from players import *
 
     # Create Game Arena
     arena = Arena()
