@@ -29,8 +29,10 @@ class Arena:
             start_time = time.time()
 
             # Make Move
-            legal, mv = cls.make_move(active_player, gb)
-
+            try:
+                legal, mv = cls.make_move(active_player, gb)
+            except Exception as e:
+                return Outcome(gb, red_won=not redsTurn, error=e)
             # Illegal Move
             if not legal:
                 return Outcome(gb, red_won=not redsTurn, last_move=mv, illegal=True)
@@ -77,17 +79,24 @@ class Arena:
 class Outcome:
     """Holds the outcome (result) of a game"""
 
-    def __init__(self, gb, red_won=True, illegal=False, last_move=None, timeout=False, tie=False):
+    def __init__(self, gb, red_won=True, illegal=False, last_move=None, timeout=False, tie=False, error=None):
         self.gb = gb
         self.red_won = red_won
         self.illegal = illegal
         self.tie = tie
         self.timeout = timeout
         self.last_move = last_move
+        self.error = error
 
     def __str__(self):
         """Verbose toString Method describing the outcome of the game"""
-        if self.tie:
+        if self.error is not None:
+            if self.red_won:
+                who = self.gb.YELLOW
+            else:
+                who = self.gb.RED
+            return "{} had an Error: {}".format(self.gb.get_occupation_string(who), self.error)
+        elif self.tie:
             return "Tie"
         elif self.illegal:
             if self.red_won:
@@ -112,10 +121,8 @@ class Outcome:
         (Used for the tournament matrix)"""
         if self.tie:
             return "T"
-        elif self.illegal:
-            return "I"
-        elif self.timeout:
-            return "t"
+        elif self.illegal or self.timeout:
+            return "E"
         elif self.red_won:
             return "<"
         else:

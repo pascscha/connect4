@@ -110,9 +110,11 @@ def tournament_players(players):
             if i != j:
                 outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)
                 print(outcome.get_char(), end=" ", flush=True)
-                if outcome.timeout or outcome.illegal:
+
+                if outcome.error is not None or outcome.timeout or outcome.illegal:
                     errors.append((players[i], players[j], outcome))
-                elif outcome.red_won:
+
+                if outcome.red_won:
                     scores[i] += 3
                 elif outcome.tie:
                     scores[j] += 1
@@ -160,7 +162,12 @@ if __name__ == "__main__":
     player_blacklist = [
         "SimplePlayerAlphaBeta",
         "SimplePlayerAlphaBetaHash",
-        "SimplePlayerMinimax"
+        "SimplePlayerMinimax",
+        "Count3PlayerHash0",
+        "Count3PlayerHash1",
+        "Count3PlayerHash2",
+        "Count3PlayerHash3",
+        "Count3PlayerHash4",
     ]
 
     # Players (Class name as string) that we want to test

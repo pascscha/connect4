@@ -112,6 +112,25 @@ class StrategyChangePlayerHash(HashedPlayer):
 
 
 .1 Seconds per Move:
+    0: Count3Player
+    1: Count3PlayerHash0
+    2: Count3PlayerHash1
+    3: Count3PlayerHash2
+    4: Count3PlayerHash3
+    5: Count3PlayerHash4
+    6: StrategyChangePlayer
+    7: StrategyChangePlayerHash
+
+      0 1 2 3 4 5 6 7
+    0 X < ^ ^ < T < T
+    1 < X ^ ^ < < ^ <
+    2 < < X ^ ^ < < ^
+    3 < ^ ^ X ^ ^ ^ ^
+    4 ^ < ^ ^ X ^ < <
+    5 < < ^ < < X < <
+    6 < < < < < < X <
+    7 ^ T ^ ^ < ^ T X
+
     Scoreboard:
     0:  30P Count3PlayerHash1
     1:  28P Count3PlayerHash4
@@ -121,6 +140,4 @@ class StrategyChangePlayerHash(HashedPlayer):
     5:  16P Count3PlayerHash0
     6:  15P Count3PlayerHash3
     7:  12P StrategyChangePlayerHash
-
-
 """
