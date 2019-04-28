@@ -63,7 +63,8 @@ class TimedPlayer(Player):
         timeout = time.time() + self.timeout * self.SAFETY_FACTOR
         move = 0
         try:
-            for depth in range(gb.ROWS * gb.COLS):
+            moves_left = gb.moves_left()
+            for depth in range(moves_left):
                 move = self.next_move_timeout(gb, depth, timeout)
         except TimeoutError:
             pass
@@ -85,13 +86,82 @@ class DepthPlayer(TimedPlayer):
         return move
 
 
+class MinimaxPlayer(TimedPlayer):
+    """[Abstract] Alpha Beta Player - Uses Alpha Beta Algorithm to evaluate Game Tree"""
+    POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
+    WIN_SCORE = 1000
+
+    MAX_SCORE = 0xfffffff0
+    MIN_SCORE = -MAX_SCORE
+
+    def next_move_timeout(self, gb, depth, timeout):
+        player = self.color  # gb.other_player(self.color)
+
+        clone = gb.clone()
+        bestMove = -1
+        bestScore = self.MIN_SCORE
+
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, player):
+                score = self.min(clone, depth - 1, timeout)
+                if score > bestScore:
+                    bestScore = score
+                    bestMove = pos
+                clone = gb.clone()
+        return bestMove
+
+    def min(self, gb, depth, timeout):
+        if gb.has_won(self.color):
+            return self.WIN_SCORE * (depth + 1)
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        bestScore = self.MAX_SCORE
+
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, gb.other_player(self.color)):
+                score = self.max(clone, depth - 1, timeout)
+                if score < bestScore:
+                    bestScore = score
+                clone = gb.clone()
+        return bestScore
+
+    def max(self, gb, depth, timeout):
+        if gb.has_won(gb.other_player(self.color)):
+            return - self.WIN_SCORE * (depth + 1)
+        elif timeout < time.time():
+            raise TimeoutError()
+        elif depth <= 0:
+            return self.score(gb, depth)
+
+        clone = gb.clone()
+
+        bestScore = self.MIN_SCORE
+
+        for pos in self.POSITION_ORDER:
+            if clone.place_stone(pos, self.color):
+                score = self.min(clone, depth - 1, timeout)
+                if score > bestScore:
+                    bestScore = score
+                clone = gb.clone()
+        return bestScore
+
+    def score(self, gb, depth):
+        """Gives a score to a given position."""
+        raise NotImplementedError("Please Implement this method")
+
+
 class AlphaBetaPlayer(TimedPlayer):
     """[Abstract] Alpha Beta Player - Uses Alpha Beta Algorithm to evaluate Game Tree"""
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
     WIN_SCORE = 1000
 
-    ALPHA_INIT = -0xfffffff0
-    BETA_INIT = 0xfffffff0
+    ALPHA_INIT = -0xfffffffffffffff0
+    BETA_INIT = -ALPHA_INIT
 
     def next_move_timeout(self, gb, depth, timeout):
         player = self.color  # gb.other_player(self.color)

@@ -84,6 +84,14 @@ class GameBoard:
         """Counts how many times a player has 3 in a row"""
         raise NotImplementedError("Please Implement this method")
 
+    def moves_left(self):
+        cnt = 0
+        for r in range(self.ROWS):
+            for c in range(self.COLS):
+                if self.get_occupation(r, c) == self.EMPTY:
+                    cnt += 1
+        return cnt
+
     @classmethod
     def get_occupation_string(cls, occupation):
         if occupation in cls.STRINGS:

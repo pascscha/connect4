@@ -103,13 +103,16 @@ def tournament_players(players):
         print(i, end=" ")
     print()
 
+    errors = []
     for i in range(len(players)):
         print(i, end=" ", flush=True)
         for j in range(len(players)):
             if i != j:
                 outcome = arena.play_game(players[i], players[j], BitBoard7x6, params)
                 print(outcome.get_char(), end=" ", flush=True)
-                if outcome.red_won:
+                if outcome.timeout or outcome.illegal:
+                    errors.append((players[i], players[j], outcome))
+                elif outcome.red_won:
                     scores[i] += 3
                 elif outcome.tie:
                     scores[j] += 1
@@ -120,6 +123,15 @@ def tournament_players(players):
                 print("X", end=" ", flush=True)
         print()
 
+    if len(errors) > 0:
+        print("\nErrors:")
+        for error in errors:
+            player1 = error[0].__name__
+            player2 = error[1].__name__
+            message = str(error[2])
+            gameboard = error[2].gb
+            print("{} (X) vs {} (O): {}\n{}\n".format(player1, player2, message, gameboard))
+
     print("\nScoreboard:")
     sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
     for i in range(len(sorted_scores)):
@@ -128,11 +140,13 @@ def tournament_players(players):
         print("{}: {:>3}P {}".format(i, score, player_name))
 
 
-def get_classes_from_module(module, blacklist):
+def get_classes_from_module(module, blacklist=None, whitelist=None):
     out = []
     for name, obj in inspect.getmembers(sys.modules[module], inspect.isclass):
-        if obj.__module__ == module and obj.__name__ not in blacklist:
-            out.append(obj)
+        if obj.__module__ == module:
+            if blacklist is None or obj.__name__ not in blacklist:
+                if whitelist is None or obj.__name__ in whitelist:
+                    out.append(obj)
     return out
 
 
@@ -140,11 +154,25 @@ if __name__ == "__main__":
 
     # Gameboards (Class name as string) that we don't want to test
     gameboard_blacklist = ["BasicGameBoard"]
-    gameboards = get_classes_from_module("gameboard.implementations", gameboard_blacklist)
+    gameboards = get_classes_from_module("gameboard.implementations", blacklist=gameboard_blacklist)
 
     # Players (Class name as string) that we don't want to test
-    player_blacklist = []
-    players = get_classes_from_module("player.implementations", player_blacklist)
+    player_blacklist = [
+        "SimplePlayerAlphaBeta",
+        "SimplePlayerAlphaBetaHash",
+        "SimplePlayerMinimax"
+    ]
+
+    # Players (Class name as string) that we want to test
+    player_whitelist = [
+        "Count3PlayerHash0",
+        "Count3PlayerHash1",
+        "Count3PlayerHash2",
+        "Count3PlayerHash3",
+        "Count3PlayerHash4",
+    ]
+
+    players = get_classes_from_module("player.implementations", blacklist=player_blacklist)
 
     # All available Tests
     tests = {test_gameboards: gameboards,

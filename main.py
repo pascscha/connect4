@@ -12,7 +12,7 @@ if __name__ == "__main__":
     params = GameParameters(timeout=1)
 
     # Perform Game and store Outcome
-    outcome = arena.play_game(StrategyChangePlayer, HumanPlayer, BitBoard7x6, params)
+    outcome = arena.play_game(SimplePlayerMinimax, HumanPlayer, BitBoard7x6, params)
 
     # Print Outcome
     print("\nGAME FINISHED - {}:\n{}".format(outcome, outcome.gb))
