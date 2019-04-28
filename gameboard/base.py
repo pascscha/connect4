@@ -5,7 +5,7 @@ np.seterr(all='ignore')
 
 """
 This file contains all Abstract GameBoard classes but no actual finished Implementations.
-The Finished Implementations can be cound in the file gameboards.py
+The Finished Implementations can be cound in the file implementations.py
 """
 
 
