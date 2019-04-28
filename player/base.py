@@ -258,6 +258,7 @@ class RandomizedAlphaBetaPlayer(AlphaBetaPlayer):
 
 
 class HashedPlayer(AlphaBetaPlayer):
+    """[Abstract] Player that uses a hashmap in order to cut away transpositions."""
     MIN_HASH_DEPTH = 0
 
     def next_move_timeout(self, gb, depth, timeout):
@@ -290,8 +291,11 @@ class HashedPlayer(AlphaBetaPlayer):
 
 
 class BookPlayer(AlphaBetaPlayer):
+
+    # The book file
     BOOK = "7x6.book"
 
+    # Lowest score
     MIN_SCORE = -0xfffffff0
 
     def __init__(self, color, params):
@@ -315,14 +319,17 @@ class BookPlayer(AlphaBetaPlayer):
 
     @staticmethod
     def bytes2int(str):
+        """Converts bytes to an integer"""
         return int.from_bytes(str, byteorder='big')
 
     @classmethod
     def med(cls, lower, upper):
+        """Returns the average between upper and lower rounded down to the next integer"""
         return (upper + lower) // 2
 
     @classmethod
     def has_factor(cls, n, lower, upper):
+        """checks if n has any factor inbetween lower and upper"""
         if lower ** 2 > n:
             return False
         elif lower + 1 >= upper:
@@ -333,12 +340,15 @@ class BookPlayer(AlphaBetaPlayer):
 
     @classmethod
     def next_prime(cls, n):
+        """Calculates the next biggest prime number of n."""
         if cls.has_factor(n, 2, n):
             return cls.next_prime(n + 1)
         else:
             return n
 
     def read_book(self, gb):
+        """Returns best Score stored in its book for this position.
+        If this position is not stored in the book it returns none."""
         if gb.ROWS * gb.COLS - gb.moves_left() <= self.DEPTH:
             i = gb.base3Rep(self.color)
 

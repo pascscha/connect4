@@ -85,6 +85,7 @@ class GameBoard:
         raise NotImplementedError("Please Implement this method")
 
     def moves_left(self):
+        """Calculates how many moves there are left on the gameboard"""
         cnt = 0
         for r in range(self.ROWS):
             for c in range(self.COLS):
@@ -94,6 +95,7 @@ class GameBoard:
 
     @classmethod
     def get_occupation_string(cls, occupation):
+        """returns the string for a occupation (Eg "X","O" or " ")"""
         if occupation in cls.STRINGS:
             return cls.STRINGS[occupation]
         else:
@@ -101,6 +103,7 @@ class GameBoard:
 
     @classmethod
     def other_player(cls, player):
+        """Returns opponent of player"""
         if player == cls.RED:
             return cls.YELLOW
         elif player == cls.YELLOW:
@@ -109,6 +112,7 @@ class GameBoard:
             raise ValueError("Unknown Player: {}".format(player))
 
     def base3RepRow(self, row, key, color):
+        """Partial base 3 Representation of a single row."""
         col = 0
         while self.get_occupation(row, col) != self.EMPTY:
             key *= 3
@@ -120,6 +124,7 @@ class GameBoard:
         return key * 3
 
     def base3Rep(self, color):
+        """Returns a base 3 representation of the current gamebaord. Horizontal mirroring is invariant."""
         key_forward = 0
         for r in range(self.ROWS):
             key_forward = self.base3RepRow(r, key_forward, color)
@@ -130,10 +135,11 @@ class GameBoard:
 
         return min(key_forward, key_backward) // 3
 
-    def apply_move_string(self, movestring):
+    def apply_move_string(self, movestring, offset=0):
+        """Takes a string of moves such as "3213" and puts stones into these positions."""
         player = self.RED
         for row in movestring:
-            row = int(row) - 1
+            row = int(row) - offset
             self.place_stone(row, player)
             player = self.other_player(player)
 
