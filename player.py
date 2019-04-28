@@ -67,7 +67,7 @@ class TimedPlayer(Player):
 
 
 class DepthPlayer(TimedPlayer):
-    DEPTH = 4
+    DEPTH = 6
 
     def next_move(self, gb):
         timeout = time.time() + 100
@@ -88,7 +88,6 @@ class MiniMaxPlayer(DepthPlayer):
         for pos in self.POSITION_ORDER:
             if clone.place_stone(pos, player):
                 score = self.min(clone, depth - 1, timeout)
-                print(pos, score)
                 if score > bestScore:
                     bestScore = score
                     bestMove = pos
@@ -142,9 +141,10 @@ class MiniMaxPlayer(DepthPlayer):
 
 class AlphaBetaPlayer(DepthPlayer):
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
-    ALPHA_INIT = -0xfffffff0
-    BETA_INIT = -ALPHA_INIT
     WIN_SCORE = 1000
+
+    ALPHA_INIT = -0xfffffff0
+    BETA_INIT = 0xfffffff0
 
     def next_move_timeout(self, gb, depth, timeout):
         player = self.color  # gb.other_player(self.color)
@@ -156,11 +156,9 @@ class AlphaBetaPlayer(DepthPlayer):
 
         for pos in self.POSITION_ORDER:
             if clone.place_stone(pos, player):
-                if clone.has_won(player):
-                    return pos
                 score = self.min(clone, depth - 1, alpha, beta, timeout)
-                print(depth, pos, score)
-                if score > alpha or bestMove == -1:
+                print(depth, pos, score, alpha, beta)
+                if score > alpha:
                     alpha = score
                     bestMove = pos
                 clone = gb.clone()
@@ -168,7 +166,7 @@ class AlphaBetaPlayer(DepthPlayer):
 
     def min(self, gb, depth, alpha, beta, timeout):
         if gb.has_won(self.color):
-            return self.WIN_SCORE * depth
+            return self.WIN_SCORE * (depth + 1)
         elif timeout < time.time():
             raise TimeoutError()
         elif depth <= 0:
@@ -178,7 +176,7 @@ class AlphaBetaPlayer(DepthPlayer):
 
         for pos in self.POSITION_ORDER:
             if clone.place_stone(pos, gb.other_player(self.color)):
-                score = self.max(gb, depth - 1, alpha, beta, timeout)
+                score = self.max(clone, depth - 1, alpha, beta, timeout)
                 if score < beta:
                     beta = score
                 if alpha >= beta:
@@ -188,7 +186,7 @@ class AlphaBetaPlayer(DepthPlayer):
 
     def max(self, gb, depth, alpha, beta, timeout):
         if gb.has_won(gb.other_player(self.color)):
-            return - self.WIN_SCORE * depth
+            return - self.WIN_SCORE * (depth + 1)
         elif timeout < time.time():
             raise TimeoutError()
         elif depth <= 0:
@@ -197,40 +195,12 @@ class AlphaBetaPlayer(DepthPlayer):
         clone = gb.clone()
 
         for pos in self.POSITION_ORDER:
-            if clone.place_stone(pos, gb.other_player(self.color)):
-                score = self.min(gb, depth - 1, alpha, beta, timeout)
+            if clone.place_stone(pos, self.color):
+                score = self.min(clone, depth - 1, alpha, beta, timeout)
                 if score > alpha:
                     alpha = score
                 if alpha >= beta:
                     return alpha
-                clone = gb.clone()
-        return alpha
-
-    def miniMax(self, gb, depth, player, alpha, beta, timeout):
-        if gb.has_won(gb.other_player(player)):
-            return -self.WIN_SCORE * depth
-        elif gb.has_won(player):
-            return self.WIN_SCORE * depth + 1
-        elif timeout < time.time():
-            raise TimeoutError()
-        elif depth <= 0:
-            return self.score(gb, depth)
-
-        clone = gb.clone()
-
-        for pos in self.POSITION_ORDER:
-            if clone.place_stone(pos, player):
-                if clone.has_won(player):
-                    return pos
-                score = -self.miniMax(clone, depth - 1, gb.other_player(player), -beta, -alpha, timeout)
-                print()
-                print(depth, pos, score, alpha, beta)
-                print(clone)
-                if score > alpha:
-                    alpha = score
-                elif alpha >= beta:
-                    return alpha
-
                 clone = gb.clone()
         return alpha
 
@@ -270,9 +240,14 @@ class SimplePlayer(MiniMaxPlayer):
             return 0
 
 
-class SimplePlayer2(RandomAlphaBetaPlayer):
+class SimplePlayer2(AlphaBetaPlayer):
     def score(self, gb, depth):
-        return gb.count3(self.color) - gb.count3(gb.other_player(self.color))
+        if gb.has_won(self.color):
+            return self.WIN_SCORE * (depth + 1)
+        elif gb.has_won(gb.other_player(self.color)):
+            return -self.WIN_SCORE * (depth + 1)
+        else:
+            return 0
 
 
 class StrategyChanger(RandomAlphaBetaPlayer):

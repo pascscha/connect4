@@ -9,6 +9,6 @@ if __name__ == "__main__":
 
     params = GameParameters(timeout=100)
 
-    outcome = arena.play_game(SimplePlayer, HumanPlayer, BitBoard7x6, params)
+    outcome = arena.play_game(SimplePlayer2, HumanPlayer, BitBoard7x6, params)
 
     print("\nGAME FINISHED - {}:\n{}".format(outcome, outcome.gb))
