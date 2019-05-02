@@ -30,6 +30,7 @@ if __name__ == "__main__":
     timeout = float(input("Please enter the timelimit (only for non-human players), 0 for no timeout: "))
     if timeout <= 0:
         timeout = None
+
     # Game Parameters
     params = GameParameters(timeout=timeout)
 
