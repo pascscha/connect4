@@ -20,7 +20,7 @@ def main():
     client = ConnectFourClient(SERVER_URL)
 
     params = GameParameters(timeout=1)
-    anker = StrategyChangePlayer(1, params)
+    anker = Count3PlayerHash3(1, params)
 
     future1 = executor.submit(
         GameRunner(client=client, player_id='Anker', strategy=anker, number_of_games=NUMBER_OF_GAMES).run)

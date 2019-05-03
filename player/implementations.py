@@ -34,7 +34,8 @@ class SimplePlayerAlphaBetaHash(HashedPlayer):
     """ Simple Player using Alpha Beta and Hashing."""
 
     def score(self, gb, depth):
-        return score_simple(gb, self.color)
+        return 0;
+        # return score_simple(gb, self.color)
 
 
 class Count3PlayerMinimax(AlphaBetaPlayer):
