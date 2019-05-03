@@ -293,7 +293,7 @@ class RandomizedAlphaBetaPlayer(AlphaBetaPlayer):
     POSITION_ORDER_BASE = [3, 2, 4, 5, 1, 0, 6]
     POSITION_ORDER = [3, 2, 4, 5, 1, 0, 6]
     RANDOMNESS = .3
-    # random.seed(0)
+    random.seed(0)
 
     def random_order(self):
         for i in range(len(self.POSITION_ORDER_BASE)):
@@ -451,8 +451,6 @@ class Cheater(Player):
 
     IS_HUMAN = True  # No timelimits for now
 
-    topscore = 0
-
     def __init__(self, color, params):
         self.move_string = ""  # String containing all moves up to this position
         super().__init__(color, params)
@@ -467,7 +465,6 @@ class Cheater(Player):
                 scores[i] = -100
 
         best = max(scores)  # Get the best score ...
-        self.topscore = best
         return scores.index(best)  # ... and return the index of it
 
     def update_gamestate(self, gb):
