@@ -42,6 +42,3 @@ if __name__ == "__main__":
 
     # Print Outcome
     print("\nGAME FINISHED - {}:\n{}".format(outcome, outcome.gb))
-
-    #np.save("games/32x1", second_player.get_x())
-    # np.save("games/32y1", second_player.get_y())
