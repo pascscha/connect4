@@ -172,12 +172,16 @@ if __name__ == "__main__":
 
     # Players (Class name as string) that we want to test
     player_whitelist = [
-        "Count3BookPlayer",
         "Count3Player",
-        "Count3PlayerRandom",
-        "SimplePlayerAlphaBetaRandom",
-        "StrategyChangePlayer",
-        "StrategyChangePlayerHash"
+        "StrategyChangePlayer30",
+        "StrategyChangePlayer40",
+        "StrategyChangePlayerBook",
+        "StrategyChangePlayerHash",
+        "Count3PlayerHash0",
+        "Count3PlayerHash3",
+        "SimplePlayerAlphaBeta",
+        "SimplePlayerAlphaBetaHash",
+        "SimplePlayerMinimax"
     ]
 
     players = get_classes_from_module("player.implementations", whitelist=player_whitelist)

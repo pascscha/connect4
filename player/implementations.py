@@ -109,6 +109,94 @@ class StrategyChangePlayer(AlphaBetaPlayer):
             return score_simple(gb, self.color)
 
 
+class StrategyChangePlayer5(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 5
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer10(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 10
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer15(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 15
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer20(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 20
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer25(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 25
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer30(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 30
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer35(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 35
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
+class StrategyChangePlayer40(AlphaBetaPlayer):
+    """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
+    STRATEGY_CHANGE = 40
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
 class StrategyChangePlayerHash(HashedPlayer):
     """Combines SimplePlayer and Count3Player by changing to the Simple (and faster) player once the game has advanced enough"""
     STRATEGY_CHANGE = 30
@@ -130,6 +218,16 @@ class Count3BookPlayer(BookPlayer):
         return score_count3(gb, self.color)
 
 
+class StrategyChangePlayerBook(BookPlayer):
+    STRATEGY_CHANGE = 30
+
+    def score(self, gb, depth):
+        if depth < self.STRATEGY_CHANGE:
+            return score_count3(gb, self.color)
+        else:
+            return score_simple(gb, self.color)
+
+
 class AnkerPlayer(Cheater):
     def next_move(self, gb):
         if gb.moves_left() != gb.ROWS * gb.COLS:
@@ -149,6 +247,27 @@ class RandomPlayer(Player):
 
 
 """
+
+
+1 Seconds per Move:
+      0 1 2 3 4 5
+    0 X ^ < < ^ T
+    1 T X T ^ < ^
+    2 T < X ^ < ^
+    3 T ^ < X ^ ^
+    4 T < ^ ^ X <
+    5 T ^ < ^ ^ X
+
+    Scoreboard:
+    0:  16P StrategyChangePlayer
+    1:  16P StrategyChangePlayer10
+    2:  14P Count3Player
+    3:  14P StrategyChangePlayer20
+    4:  12P Count3BookPlayer
+    5:  11P SimplePlayerAlphaBetaRandom
+
+
+
 .1 Seconds per Move:
     Scoreboard:
     0:  21P Count3PlayerHash
@@ -206,5 +325,28 @@ class RandomPlayer(Player):
     2:  12P Count3Player
     3:  12P Count3PlayerMinimax
     4:   6P Count3PlayerRandom
+
+
+
+1 Seconds per Move:
+      0 1 2 3 4 5 6 7
+    0 X ^ < T < < ^ <
+    1 < X < ^ < ^ < <
+    2 < ^ X < ^ ^ < <
+    3 ^ ^ < X ^ T ^ <
+    4 T ^ < < X < ^ <
+    5 < < ^ < T X T <
+    6 ^ < ^ ^ ^ < X <
+    7 ^ ^ ^ ^ < ^ ^ X
+
+    Scoreboard:
+    0:  30P Count3Player
+    1:  24P StrategyChangePlayer
+    2:  23P Count3BookPlayer
+    3:  23P SimplePlayerAlphaBetaRandom
+    4:  22P StrategyChangePlayerBook
+    5:  21P Count3PlayerHash0
+    6:  17P Count3PlayerRandom
+    7:   3P StrategyChangePlayerHash
 
 """

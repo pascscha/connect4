@@ -25,6 +25,8 @@ class Player:
             self.timeout = 0xdeadbeef
         self.gameBoardCls = params.gameBoardCls
 
+        self.verbose = params.verbose
+
     def drop_disc(self, board=None):
 
         gb_internal = self.gameBoardCls()
@@ -126,6 +128,8 @@ class TimedPlayer(Player):
                 move = self.next_move_timeout(gb, depth, timeout)
         except TimeoutError:
             pass
+        if self.verbose:
+            print("Timeout reached at depth {}".format(depth))
         return move
 
     def next_move_timeout(self, gb, depth, timeout):
