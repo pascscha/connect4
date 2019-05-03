@@ -71,7 +71,7 @@ def test_player(Player):
     gb = BitBoard7x6()
     p = Player(gb.RED, params)
     while not gb.is_finished():
-        move = p.drop_disc(gb)
+        move = p.next_move(gb)
         gb.place_stone(move, p.color)
         p.color = gb.other_player(p.color)
 

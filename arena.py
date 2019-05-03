@@ -16,7 +16,7 @@ class Arena:
         if params.verbose:
             print("\nWelcome to the Epic battle of {} vs {}!".format(playerRed.get_name(), playerYellow.get_name()))
             print("Move #0 - {} ({}):".format(gb.get_occupation_string(playerRed.color),
-                                              playerRed.get_name()))
+                                                playerRed.get_name()))
             print(gb)
 
         # Red (1st Player) can start
@@ -74,7 +74,7 @@ class Arena:
     @classmethod
     def make_move(cls, player, gb):
         """Let a player make a move and check wether it's legal or not"""
-        move = player.drop_disc(gb)
+        move = player.next_move(gb)
         if not gb.is_legal(move):
             return False, move
         else:

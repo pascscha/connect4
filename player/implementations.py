@@ -131,8 +131,9 @@ class Count3BookPlayer(BookPlayer):
 
 
 class CheatPlayer(Cheater):
-    def drop_disc(self, gb):
-        self.update_gamestate(gb)
+    def next_move(self, gb):
+        if gb.moves_left() != gb.ROWS * gb.COLS:
+            self.update_gamestate(gb)
         out = self.solve(self.move_string)
         self.move_string += str(out + 1)
         return out
