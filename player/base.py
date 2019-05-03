@@ -24,7 +24,7 @@ class Player:
         else:
             self.timeout = 0xdeadbeef
 
-    def drop_disc(self, gb):
+    def next_move(self, gb):
         """Takes a game board and returns the next move"""
         raise NotImplementedError("Please Implement this method")
 
@@ -43,7 +43,7 @@ class HumanPlayer(Player):
 
         super().__init__(color, params)
 
-    def drop_disc(self, gb):
+    def next_move(self, gb):
         while True:
             move_raw = input("Player {}, were do you want to move next? ".format(gb.get_occupation_string(self.color)))
             if move_raw == "exit":
@@ -71,18 +71,18 @@ class TimedPlayer(Player):
     """[Abstract] Base Class for plaers with time limits"""
     SAFETY_FACTOR = .95
 
-    def drop_disc(self, gb):
+    def next_move(self, gb):
         timeout = time.time() + self.timeout * self.SAFETY_FACTOR
         move = 0
         try:
             moves_left = gb.moves_left()
             for depth in range(moves_left):
-                move = self.drop_disc_timeout(gb, depth, timeout)
+                move = self.next_move_timeout(gb, depth, timeout)
         except TimeoutError:
             pass
         return move
 
-    def drop_disc_timeout(self, gb, depth, timeout):
+    def next_move_timeout(self, gb, depth, timeout):
         """Tries to calculate best move within a certain timeout. If timeout is reached before,
         a timeout exception gets thrown."""
         raise NotImplementedError("Please Implement this method")
@@ -92,9 +92,9 @@ class DepthPlayer(TimedPlayer):
     """[Abstract] Base Class for players that always have the same serach depth (useful for debugging)"""
     DEPTH = 6
 
-    def drop_disc(self, gb):
+    def next_move(self, gb):
         timeout = time.time() + 100
-        move = self.drop_disc_timeout(gb, self.DEPTH, timeout)
+        move = self.next_move_timeout(gb, self.DEPTH, timeout)
         return move
 
 
@@ -106,7 +106,7 @@ class MinimaxPlayer(TimedPlayer):
     MAX_SCORE = 0xfffffff0
     MIN_SCORE = -MAX_SCORE
 
-    def drop_disc_timeout(self, gb, depth, timeout):
+    def next_move_timeout(self, gb, depth, timeout):
         player = self.color  # gb.other_player(self.color)
 
         clone = gb.clone()
@@ -175,7 +175,7 @@ class AlphaBetaPlayer(TimedPlayer):
     ALPHA_INIT = -0xfffffffffffffff0
     BETA_INIT = -ALPHA_INIT
 
-    def drop_disc_timeout(self, gb, depth, timeout):
+    def next_move_timeout(self, gb, depth, timeout):
         player = self.color  # gb.other_player(self.color)
         alpha = self.ALPHA_INIT
         beta = self.BETA_INIT
@@ -255,20 +255,20 @@ class RandomizedAlphaBetaPlayer(AlphaBetaPlayer):
                 self.POSITION_ORDER[i] = self.POSITION_ORDER[i + 1]
                 self.POSITION_ORDER[i + 1] = temp
 
-    def drop_disc_timeout(self, gb, depth, timeout):
+    def next_move_timeout(self, gb, depth, timeout):
         self.random_order()  # Randomize order before every move
-        return super().drop_disc_timeout(gb, depth, timeout)
+        return super().next_move_timeout(gb, depth, timeout)
 
 
 class HashedPlayer(AlphaBetaPlayer):
     """[Abstract] Player that uses a hashmap in order to cut away transpositions."""
     MIN_HASH_DEPTH = 0
 
-    def drop_disc_timeout(self, gb, depth, timeout):
+    def next_move_timeout(self, gb, depth, timeout):
         self.hash_map = []
         for i in range(depth + 1):
             self.hash_map.append({})
-        return super().drop_disc_timeout(gb, depth, timeout)
+        return super().next_move_timeout(gb, depth, timeout)
 
     def min(self, gb, depth, alpha, beta, timeout):
         if depth >= self.MIN_HASH_DEPTH:
@@ -303,6 +303,7 @@ class BookPlayer(AlphaBetaPlayer):
     MIN_SCORE = -0xfffffff0
 
     def __init__(self, color, params):
+        print("Init")
         try:
             with open(self.BOOK, "rb") as f:
                 self.WIDTH = self.bytes2int(f.read(1))
@@ -368,7 +369,7 @@ class BookPlayer(AlphaBetaPlayer):
         else:
             return None
 
-    def drop_disc(self, gb):
+    def next_move(self, gb):
         if self.book_open:
 
             clone = gb.clone()
@@ -389,11 +390,11 @@ class BookPlayer(AlphaBetaPlayer):
 
             if bestMove < 0 and has_none:
                 self.book_open = False
-                return super().drop_disc(gb)
+                return super().next_move(gb)
             else:
                 return bestMove
         else:
-            return super().drop_disc(gb)
+            return super().next_move(gb)
 
 
 class Cheater(Player):
