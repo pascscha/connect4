@@ -184,7 +184,7 @@ if __name__ == "__main__":
         #"Count3PlayerHash4",
     ]
 
-    players = get_classes_from_module("player.implementations", whitelist=player_whitelist)
+    players = get_classes_from_module("player.implementations", blacklist=player_blacklist)
 
     # All available Tests
     tests = {test_gameboards: gameboards,

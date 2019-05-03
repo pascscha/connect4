@@ -54,6 +54,7 @@ class Player:
 
         # gb_internal.update_top_empty()
         self.timeout = 1
+        gb_internal.update_top_empty()
         print("Current gamestate:\n{}".format(gb_internal))
 
         out = self.next_move(gb_internal)
@@ -76,15 +77,6 @@ class Player:
     def get_name(self):
         """Returns Name of this player"""
         return self.__class__.__name__
-
-
-class RandomPlayer(Player):
-    def next_move(self, gb):
-        possible = []
-        for r in range(gb.ROWS):
-            if(gb.is_legal(r)):
-                possible.append(r)
-        return random.choice(possible)
 
 
 class HumanPlayer(Player):

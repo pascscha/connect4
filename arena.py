@@ -139,7 +139,7 @@ class Outcome:
 class GameParameters:
     """Parameters for a connect 4 game"""
 
-    def __init__(self, timeout=None, verbose=True, gameBoardCls=BasicGameBoard):
+    def __init__(self, timeout=None, verbose=True, gameBoardCls=BitBoard7x6):
         self.timeout = timeout
         self.verbose = verbose
         self.gameBoardCls = gameBoardCls

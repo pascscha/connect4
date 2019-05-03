@@ -122,7 +122,7 @@ class BitBoard7x6(GameBoard):
             super().copy_gamestate(other)
 
     def update_top_empty(self):
-        self.top_emtpy = np.int64(0)
+        self.top_empty = np.int64(0)
         for r in range(self.ROWS):
             for c in range(self.COLS + 1):
                 position = 1 << (c + 8 * r)
@@ -150,6 +150,10 @@ class BitBoard7x6(GameBoard):
             return True
         else:
             return False
+
+    def is_top(self, row, col):
+        position = 1 << (col + 8 * row)
+        return (self.top_empty & position) != 0
 
     def get_occupation(self, row, col):
         position = 1 << (col + 8 * row)
