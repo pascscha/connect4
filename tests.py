@@ -204,3 +204,5 @@ if __name__ == "__main__":
     function = list(tests)[choice]
     param = list(tests.values())[choice]
     function(param)
+
+# Test
