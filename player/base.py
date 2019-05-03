@@ -339,7 +339,7 @@ class HashedPlayer(AlphaBetaPlayer):
             return super().max(gb, depth, alpha, beta, timeout)
 
 
-class BookPlayer(AlphaBetaPlayer):
+class BookPlayer(HashedPlayer):
     """[Abstract] Player that uses an opening book for the first moves"""
 
     # The book file
@@ -349,7 +349,6 @@ class BookPlayer(AlphaBetaPlayer):
     MIN_SCORE = -0xfffffff0
 
     def __init__(self, color, params):
-        print("Init")
         try:
             with open(self.BOOK, "rb") as f:
                 self.WIDTH = self.bytes2int(f.read(1))

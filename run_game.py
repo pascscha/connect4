@@ -10,7 +10,7 @@ from player.implementations import *
 from arena import GameParameters
 
 NUMBER_OF_GAMES = 1_000
-SERVER_URL = "http://localhost:8080"
+SERVER_URL = "https://connect-four-challenge.herokuapp.com/"
 
 
 def main():
@@ -19,17 +19,18 @@ def main():
 
     client = ConnectFourClient(SERVER_URL)
 
-    params = GameParameters()
-    simple = SimplePlayerAlphaBeta(1, params)
-    superduper = Count3BookPlayer(1, params)
+    params = GameParameters(timeout=1)
+    anker = StrategyChangePlayer(1, params)
+    anker2 = StrategyChangePlayer(1, params)
 
     future1 = executor.submit(
-        GameRunner(client=client, player_id='Alice', strategy=simple, number_of_games=NUMBER_OF_GAMES).run)
+        GameRunner(client=client, player_id='Anker', strategy=anker, number_of_games=NUMBER_OF_GAMES).run)
+
     future2 = executor.submit(
-        GameRunner(client=client, player_id='Bob', strategy=superduper, number_of_games=NUMBER_OF_GAMES).run)
+        GameRunner(client=client, player_id='Anker2', strategy=anker2, number_of_games=NUMBER_OF_GAMES).run)
 
     while not future1.done() and not future2.done():
-        time.sleep(1)
+        time.sleep(100)
 
     logging.info('Done!')
 
