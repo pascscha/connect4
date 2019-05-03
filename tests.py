@@ -155,7 +155,7 @@ def get_classes_from_module(module, blacklist=None, whitelist=None):
 if __name__ == "__main__":
 
     # Gameboards (Class name as string) that we don't want to test
-    gameboard_blacklist = ["BasicGameBoard"]
+    gameboard_blacklist = []
     gameboards = get_classes_from_module("gameboard.implementations", blacklist=gameboard_blacklist)
 
     # Players (Class name as string) that we don't want to test
