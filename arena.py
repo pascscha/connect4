@@ -1,4 +1,5 @@
 import time
+from gameboard.implementations import BitBoard7x6
 
 
 class Arena:
@@ -16,7 +17,7 @@ class Arena:
         if params.verbose:
             print("\nWelcome to the Epic battle of {} vs {}!".format(playerRed.get_name(), playerYellow.get_name()))
             print("Move #0 - {} ({}):".format(gb.get_occupation_string(playerRed.color),
-                                                playerRed.get_name()))
+                                              playerRed.get_name()))
             print(gb)
 
         # Red (1st Player) can start
@@ -138,6 +139,7 @@ class Outcome:
 class GameParameters:
     """Parameters for a connect 4 game"""
 
-    def __init__(self, timeout=None, verbose=True):
+    def __init__(self, timeout=None, verbose=True, gameBoardCls=BitBoard7x6):
         self.timeout = timeout
         self.verbose = verbose
+        self.gameBoardCls = gameBoardCls

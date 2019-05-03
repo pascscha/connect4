@@ -24,6 +24,13 @@ class Player:
         else:
             self.timeout = 0xdeadbeef
 
+    def drop_disc(self, gb):
+        row = 0
+        col = 0
+        bitboard =
+        for disc in gb.state():
+            self.
+
     def next_move(self, gb):
         """Takes a game board and returns the next move"""
         raise NotImplementedError("Please Implement this method")
