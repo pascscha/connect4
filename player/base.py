@@ -81,9 +81,9 @@ class Player:
 class RandomPlayer(Player):
     def next_move(self, gb):
         possible = []
-        for c in range(gb.COLS):
-            if(gb.is_legal(c)):
-                possible.append(c)
+        for r in range(gb.ROWS):
+            if(gb.is_legal(r)):
+                possible.append(r)
         return random.choice(possible)
 
 

@@ -139,6 +139,15 @@ class AnkerPlayer(Cheater):
         return out
 
 
+class RandomPlayer(Player):
+    def next_move(self, gb):
+        possible = []
+        for r in range(gb.ROWS):
+            if(gb.is_legal(r)):
+                possible.append(r)
+        return random.choice(possible)
+
+
 """
 .1 Seconds per Move:
     Scoreboard:
