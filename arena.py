@@ -39,6 +39,7 @@ class Arena:
             try:
                 legal, mv = cls.make_move(active_player, gb)
             except Exception as e:
+                raise e
                 return Outcome(gb, red_won=not redsTurn, error=e)
             # Illegal Move
             if not legal:
