@@ -121,6 +121,16 @@ class BitBoard7x6(GameBoard):
         else:
             super().copy_gamestate(other)
 
+    def update_top_empty(self):
+        self.top_emtpy = np.int64(0)
+        for r in range(self.ROWS):
+            for c in range(self.COLS + 1):
+                position = 1 << (c + 8 * r)
+                if c == self.COLS or self.get_occupation(r, c) == self.EMPTY:
+                    print("top empty at ", r, c)
+                    self.top_empty |= position
+                    break
+
     @classmethod
     def other_player(cls, player):
         return 1 - player

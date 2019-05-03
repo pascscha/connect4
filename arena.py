@@ -1,5 +1,5 @@
 import time
-from gameboard.implementations import BitBoard7x6
+from gameboard.implementations import *
 
 
 class Arena:
@@ -139,7 +139,7 @@ class Outcome:
 class GameParameters:
     """Parameters for a connect 4 game"""
 
-    def __init__(self, timeout=None, verbose=True, gameBoardCls=BitBoard7x6):
+    def __init__(self, timeout=None, verbose=True, gameBoardCls=BasicGameBoard):
         self.timeout = timeout
         self.verbose = verbose
         self.gameBoardCls = gameBoardCls

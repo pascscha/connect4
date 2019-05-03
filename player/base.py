@@ -23,13 +23,51 @@ class Player:
             self.timeout = params.timeout
         else:
             self.timeout = 0xdeadbeef
+        self.gameBoardCls = params.gameBoardCls
 
-    def drop_disc(self, gb):
+    def drop_disc(self, board=None):
+
+        gb_internal = self.gameBoardCls()
+
+        conversion = {"Y": gb_internal.YELLOW,
+                      "R": gb_internal.RED,
+                      "E": gb_internal.EMPTY,
+                      "YELLOW": gb_internal.YELLOW,
+                      "RED": gb_internal.RED,
+                      "EMPTY": gb_internal.EMPTY,
+                      }
+
+        gamestate = board.state()
+        self.color = conversion[board.disc_color]
+        print(self.color)
+
         row = 0
-        col = 0
-        bitboard =
-        for disc in gb.state():
-            self.
+        col = gb_internal.COLS - 1
+        for disc in gamestate:
+            disc_converted = conversion[disc]
+            if disc_converted != gb_internal.EMPTY:
+                gb_internal.set_occupation(row, col, conversion[disc])
+            row += 1
+            if row == gb_internal.ROWS:
+                row = 0
+                col -= 1
+
+        # gb_internal.update_top_empty()
+        self.timeout = 1
+        print("Current gamestate:\n{}".format(gb_internal))
+
+        out = self.next_move(gb_internal)
+        print("returning {}".format(out))
+        return out
+
+    def win(self, board):
+        pass
+
+    def loose(self, board):
+        pass
+
+    def draw(self, board):
+        pass
 
     def next_move(self, gb):
         """Takes a game board and returns the next move"""

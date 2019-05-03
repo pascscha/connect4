@@ -6,6 +6,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 from api import GameRunner, ConnectFourClient, RandomPlayerStrategy
 
+from player.implementations import *
+from arena import GameParameters
+
 NUMBER_OF_GAMES = 1_000
 SERVER_URL = "http://localhost:8080"
 
@@ -16,7 +19,8 @@ def main():
 
     client = ConnectFourClient(SERVER_URL)
 
-    strategy = RandomPlayerStrategy()
+    params = GameParameters()
+    strategy = SimplePlayerAlphaBeta(1, params)
 
     future1 = executor.submit(
         GameRunner(client=client, player_id='Alice', strategy=strategy, number_of_games=NUMBER_OF_GAMES).run)

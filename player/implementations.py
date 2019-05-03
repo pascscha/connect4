@@ -130,7 +130,7 @@ class Count3BookPlayer(BookPlayer):
         return score_count3(gb, self.color)
 
 
-class CheatPlayer(Cheater):
+class AnkerPlayer(Cheater):
     def next_move(self, gb):
         if gb.moves_left() != gb.ROWS * gb.COLS:
             self.update_gamestate(gb)
