@@ -10,6 +10,7 @@ import os
 This file contains all Abstract Player classes but no actual finished Implementations.
 The Finished Implementations can be cound in the file implementations.py
 """
+machine_learning = False
 
 
 class Player:
