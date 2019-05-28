@@ -37,19 +37,19 @@ def test_gameboards(gameboards):
 
         for r in range(gb.ROWS):
             for c in range(gb.COLS):
-                assert(gb.get_occupation(r, c) == gb.EMPTY)
+                assert (gb.get_occupation(r, c) == gb.EMPTY)
 
-        assert(gb.place_stone(1, gb.RED))
-        assert(gb.place_stone(1, gb.YELLOW))
-        assert(gb.place_stone(1, gb.RED))
-        assert(gb.place_stone(2, gb.YELLOW))
-        assert(gb.place_stone(1, gb.RED))
-        assert(gb.place_stone(2, gb.YELLOW))
-        assert(gb.place_stone(1, gb.RED))
-        assert(gb.place_stone(2, gb.YELLOW))
-        assert(gb.place_stone(1, gb.RED))
+        assert (gb.place_stone(1, gb.RED))
+        assert (gb.place_stone(1, gb.YELLOW))
+        assert (gb.place_stone(1, gb.RED))
+        assert (gb.place_stone(2, gb.YELLOW))
+        assert (gb.place_stone(1, gb.RED))
+        assert (gb.place_stone(2, gb.YELLOW))
+        assert (gb.place_stone(1, gb.RED))
+        assert (gb.place_stone(2, gb.YELLOW))
+        assert (gb.place_stone(1, gb.RED))
 
-        assert(gb.has_won(gb.RED))
+        assert (gb.has_won(gb.RED))
 
         print("- Done!")
 
@@ -172,6 +172,7 @@ if __name__ == "__main__":
 
     # Players (Class name as string) that we want to test
     player_whitelist = [
+        # "MachineLearning",
         "Count3Player",
         "StrategyChangePlayer30",
         "StrategyChangePlayer40",

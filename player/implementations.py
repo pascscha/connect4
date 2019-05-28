@@ -1,4 +1,12 @@
 from player.base import *
+import numpy as np
+if machine_learning:
+    from keras.models import load_model
+    array_x = 0
+    array_y = 0
+    target = 0
+    counter = 0
+    model = 0
 
 
 def score_simple(gb, color):
@@ -229,7 +237,7 @@ class StrategyChangePlayerBook(BookPlayer):
             return score_simple(gb, self.color)
 
 
-class AnkerPlayer(Cheater):
+class CheaterPlayer(Cheater):
     def next_move(self, gb):
         if gb.moves_left() != gb.ROWS * gb.COLS:
             self.update_gamestate(gb)
@@ -245,6 +253,88 @@ class RandomPlayer(Player):
             if(gb.is_legal(r)):
                 possible.append(r)
         return random.choice(possible)
+
+
+class CheaterRandom(Cheater):
+    def next_move(self, gb):
+        possible = []
+        for r in range(gb.ROWS):
+            if (gb.is_legal(r)):
+                possible.append(r)
+        out1 = random.choice(possible)
+
+        if gb.moves_left() != gb.ROWS * gb.COLS:
+            self.update_gamestate(gb)
+        out2 = self.solve(self.move_string)
+        out = random.choice([out1, out2, out2])
+        self.move_string += str(out + 1)
+        return out
+
+
+class DataCollector(Cheater):
+    """
+    def __init__(self, color, params):
+        global array_x, array_y, counter
+        array_x = np.zeros((21, 6, 7))
+        array_x.fill(4)
+        array_y = np.zeros((21, 1))
+        counter = 0
+        super().__init__(color, params)
+    """
+
+    def next_move(self, gb):
+        global array_x, array_y, counter
+        for i in range(7):
+            for j in range(6):
+                array_x[counter][j][i] = gb.get_occupation(i, 5 - j)
+
+        if gb.moves_left() != gb.ROWS * gb.COLS:
+            self.update_gamestate(gb)
+        out = self.solve(self.move_string)
+        self.move_string += str(out + 1)
+
+        # array_y[counter] = self.topscore
+
+        counter += 1
+
+        return out
+
+    @staticmethod
+    def get_x():
+        global array_x
+        return array_x
+
+    @staticmethod
+    def get_y():
+        global array_y
+        return array_y
+
+
+class MachineLearning(AlphaBetaPlayer):
+    IS_HUMAN = True
+
+    def __init__(self, color, params):
+        global array_x, model
+        array_x = np.zeros((2, 6, 7, 2))
+        model = load_model("keras/AnkerAI2")
+
+        super().__init__(color, params)
+
+    def score(self, gb, depth):
+        global array_x, model
+
+        for i in range(7):
+            for j in range(6):
+                current = gb.get_occupation(i, 5 - j)
+                if current == 0:
+                    array_x[0][j][i][0] = 1
+                    array_x[1][j][6 - i][0] = 1
+                elif current == 1:
+                    array_x[0][j][i][1] = 1
+                    array_x[1][j][6 - i][1] = 1
+
+        prediction = model.predict(array_x)
+        return 0.5 * (prediction[0] + prediction[1])
 
 
 """
